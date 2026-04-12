@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap');
+
+
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body{
+  font-family: "Playfair", serif;
+}
+
+*{
+  font-family: "Outfit", sans-serif;
+  /* font-family: "Arial", sans-serif; */
+}
+
+.marquee-inner {
+  animation: marqueeScroll linear infinite;
+}
+
+@keyframes marqueeScroll {
+  0% {
+      transform: translateX(0%);
+  }
+
+  100% {
+      transform: translateX(-50%);
+  }
+}
+
+
+@keyframes scroll-up {
+  0% {
+      transform: translateY(0);
+  }
+  100% {
+      transform: translateY(-50%);
+  }
+}
+.animate-scroll-up-1 {
+  animation: scroll-up 25s linear infinite;
+}
+.animate-scroll-up-2 {
+  animation: scroll-up 30s linear infinite;
+}
+.animate-scroll-up-3 {
+  animation: scroll-up 20s linear infinite; 
+}
+
+
+.hero-slide {
+  animation: heroZoom 10s ease forwards;
+}
+
+@keyframes heroZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}

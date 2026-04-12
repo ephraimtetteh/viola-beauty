@@ -1,0 +1,30 @@
+cat > .gitignore << 'EOF'
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files
+.env
+*/.env
+backend/.env
+client/.env
+client/.env.production
+
+# Build output
+dist/
+*/dist/
+build/
+*/build/
+
+# OS files
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Vite
+*.local
+EOF
