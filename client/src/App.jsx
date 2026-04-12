@@ -65,7 +65,7 @@ const PageLoader = () => (
 
     {/* Quote */}
     <p className="text-xs text-gray-400 italic max-w-xs text-center leading-relaxed mt-2">
-      "True beauty is on the inside."
+      "True beauty is on the inside!."
     </p>
 
     {/* Keyframes */}
