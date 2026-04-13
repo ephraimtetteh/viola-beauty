@@ -144,3 +144,76 @@ export const sendStatusEmail = async (booking, status) => {
     message: `Status email (${status}) sent to ${booking.email}`,
   });
 };
+
+
+
+// ── Reminder email ──
+export const sendReminderEmail = async (booking, days) => {
+  const label = days === 1 ? "tomorrow" : `in ${days} days`;
+
+  // To client
+  await transporter.sendMail({
+    from:    `"Viola Beauty" <${process.env.NODEMAILER_USER}>`,
+    to:      booking.email,
+    replyTo: process.env.NODEMAILER_USER,
+    subject: `Reminder: Your Viola Beauty Appointment is ${label}! 💄`,
+    html: wrap(
+      `Your Appointment is ${label}! 🗓️`,
+      `<p style="color:#555;font-size:14px;line-height:1.8;margin:0 0 16px;">
+        Hi <strong>${booking.firstName}</strong>, just a friendly reminder that
+        your <strong style="color:#7c5546;">${booking.package}</strong>
+        appointment with Viola Beauty is <strong>${label}</strong> on
+        <strong>${booking.date}</strong>.
+      </p>
+      ${bookingTable(booking)}
+      <div style="background:#fdf6e3;border-left:3px solid #d4b86a;
+                  border-radius:0 12px 12px 0;padding:14px 18px;margin:20px 0;">
+        <p style="color:#7c5546;font-size:13px;font-weight:700;margin:0 0 8px;">
+          Before your appointment:
+        </p>
+        <p style="color:#555;font-size:13px;line-height:1.7;margin:0;">
+          ✦ Complete your skin prep routine<br/>
+          ✦ Arrive 5–10 minutes early<br/>
+          ✦ Bring reference photos if you have them<br/>
+          ✦ Contact us if you need to reschedule
+        </p>
+      </div>`
+    ),
+  });
+
+  // To admins
+  await transporter.sendMail({
+    from:    `"Viola Reminders" <${process.env.NODEMAILER_USER}>`,
+    to:      ADMIN_EMAILS.join(","),
+    subject: `📅 ${days}-Day Reminder: ${booking.firstName} ${booking.lastName} | ${booking.date}`,
+    html: wrap(
+      `${days}-Day Appointment Reminder`,
+      `<div style="background:#fdf6e3;border:1px solid #d4b86a;border-radius:12px;
+                  padding:14px 18px;margin:0 0 20px;">
+        <p style="color:#7c5546;font-size:13px;font-weight:700;margin:0;">
+          📅 This appointment is ${label}
+        </p>
+      </div>
+      ${infoTable([
+        ["Client", `${booking.firstName} ${booking.lastName}`],
+        ["Phone",  booking.phone],
+        ["Email",  booking.email],
+      ])}
+      ${bookingTable(booking)}
+      <div style="text-align:center;margin:20px 0;">
+        <a href="mailto:${booking.email}"
+          style="display:inline-block;background:#1a1a1a;color:#fff;
+                 text-decoration:none;padding:12px 28px;border-radius:50px;
+                 font-size:13px;font-weight:600;margin:0 6px;">
+          Email Client
+        </a>
+        <a href="tel:${booking.phone}"
+          style="display:inline-block;background:#d4b86a;color:#1a1a1a;
+                 text-decoration:none;padding:12px 28px;border-radius:50px;
+                 font-size:13px;font-weight:600;margin:0 6px;">
+          Call Client
+        </a>
+      </div>`
+    ),
+  });
+};

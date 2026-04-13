@@ -9,9 +9,12 @@ import bookingRoutes from "./routes/bookings.js";
 import rateRoutes from "./routes/rates.js";
 import activityRoutes from "./routes/activity.js";
 import userRoutes from "./routes/users.js";
+import reminderRoutes from "./routes/reminders.js"; // ✅ new
+import analyticsRoutes from "./routes/analytics.js"; // ✅ new
+
+import { startReminderCron } from "./services/reminders.js"; // ✅ new
 
 dotenv.config();
-
 const app = express();
 
 const allowedOrigins = [
@@ -24,11 +27,8 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS blocked: ${origin}`));
-      }
+      if (!origin || allowedOrigins.includes(origin)) callback(null, true);
+      else callback(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,
   }),
@@ -42,6 +42,8 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/rates", rateRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/reminders", reminderRoutes); // ✅
+app.use("/api/analytics", analyticsRoutes); // ✅
 
 app.get("/", (req, res) => res.json({ status: "Viola API ✅" }));
 
@@ -49,8 +51,9 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
-    app.listen(process.env.PORT || 4000, () =>
-      console.log(`✅ Server on port ${process.env.PORT || 4000}`),
-    );
+    app.listen(process.env.PORT || 4000, () => {
+      console.log(`✅ Server on port ${process.env.PORT || 4000}`);
+      startReminderCron(); // ✅ start daily cron
+    });
   })
   .catch(console.error);
