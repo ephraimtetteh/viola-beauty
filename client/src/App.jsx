@@ -21,6 +21,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import UserDashboard from "./pages/UserDashboard";
 
+
 const Education = lazy(() => import("./pages/education"));
 const Booking = lazy(() => import("./pages/ratecard"));
 const Home = lazy(() => import("./pages/home"));
