@@ -19,7 +19,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import UserDashboard from "./pages/UserDashboard";
+// import UserDashboard from "./pages/UserDashboard";
 
 
 const Education = lazy(() => import("./pages/education"));
@@ -131,7 +131,7 @@ const App = () => {
             <Route path="/register" element={<Register />} />
 
             {/* User dashboard */}
-            <Route path="/dashboard" element={<UserDashboard />} />
+            {/* <Route path="/dashboard" element={<UserDashboard />} /> */}
 
             {/* Admin */}
             <Route path="/admin/setup" element={<AdminSetup />} />
