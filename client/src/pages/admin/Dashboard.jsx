@@ -1,18 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useState, useEffect } from "react";
+import { useNavigate }         from "react-router-dom";
+import { useAuth }             from "../../context/AuthContext";
+import Sidebar                 from "../../components/admin/Sidebar";
+
+const API = import.meta.env.VITE_API_URL;
 
 // ── API helper ──
-// ── Replace the existing useApi hook with this ──
-const API = import.meta.env.VITE_API_URL; // ✅ full backend URL
-
 const useApi = () => {
   const token = localStorage.getItem("viola_token");
   return {
     token,
     authHeaders: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      Authorization:  `Bearer ${token}`,
     },
   };
 };
@@ -58,48 +58,57 @@ const inputCls =
 // ── Bookings Tab ──
 const BookingsTab = () => {
   const { authHeaders } = useApi();
-  const [bookings,  setBookings]  = useState([]);
-  const [filter,    setFilter]    = useState({ status: "", category: "", search: "" });
-  const [selected,  setSelected]  = useState(null);
-  const [loading,   setLoading]   = useState(true);
+  const [bookings, setBookings] = useState([]);
+  const [filter,   setFilter]   = useState({ status: "", category: "", search: "" });
+  const [selected, setSelected] = useState(null);
+  const [loading,  setLoading]  = useState(true);
 
   const fetchBookings = async () => {
     setLoading(true);
-    const p = new URLSearchParams(
-      Object.fromEntries(Object.entries(filter).filter(([, v]) => v)),
-    );
-    const res = await fetch(`${API}/api/bookings?${p}`, {
-      headers: authHeaders,
-    });
-    setBookings(await res.json());
-    setLoading(false);
+    try {
+      const p   = new URLSearchParams(
+        Object.fromEntries(Object.entries(filter).filter(([, v]) => v))
+      );
+      const res = await fetch(`${API}/api/bookings?${p}`, { headers: authHeaders });
+      const data = await res.json();
+      setBookings(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch bookings:", err);
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // ✅ Re-fetch when filter changes
-  useEffect(() => {
-    fetchBookings();
-  }, [filter]);
+  useEffect(() => { fetchBookings(); }, [filter]);
 
   const updateStatus = async (id, status) => {
-    await fetch(`${API}/api/bookings/${id}/status`, {
-      method: "PATCH",
-      headers: authHeaders,
-      body: JSON.stringify({ status }),
-    });
-    setSelected(null);
-    fetchBookings(); // ✅ was fetch_()
+    try {
+      await fetch(`${API}/api/bookings/${id}/status`, {
+        method:  "PATCH",
+        headers: authHeaders,
+        body:    JSON.stringify({ status }),
+      });
+      setSelected(null);
+      fetchBookings();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
   };
 
   const remove = async (id) => {
     if (!confirm("Delete this booking?")) return;
-    await fetch(`${API}/api/bookings/${id}`, {
-      method: "DELETE",
-      headers: authHeaders,
-    });
-    setSelected(null);
-    fetchBookings(); // ✅ was fetch_()
+    try {
+      await fetch(`${API}/api/bookings/${id}`, {
+        method:  "DELETE",
+        headers: authHeaders,
+      });
+      setSelected(null);
+      fetchBookings();
+    } catch (err) {
+      console.error("Failed to delete:", err);
+    }
   };
-  
 
   return (
     <div className="space-y-5">
@@ -110,43 +119,35 @@ const BookingsTab = () => {
             type="text"
             placeholder="Search..."
             value={filter.search}
-            onChange={(e) => setFilter({ ...filter, search: e.target.value })}
-            className="border border-[#e8d9cc] rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#d4b86a] w-52"
+            onChange={e => setFilter({ ...filter, search: e.target.value })}
+            className="border border-[#e8d9cc] rounded-full px-4 py-2 text-sm
+              focus:outline-none focus:border-[#d4b86a] w-52"
           />
           {[
-            {
-              key: "status",
-              opts: ["pending", "confirmed", "declined"],
-              label: "All Status",
-            },
-            {
-              key: "category",
-              opts: ["Bridal", "Glam Sessions", "Classes"],
-              label: "All Categories",
-            },
+            { key: "status",   opts: ["pending","confirmed","declined"],    label: "All Status"     },
+            { key: "category", opts: ["Bridal","Glam Sessions","Classes"],  label: "All Categories" },
           ].map(({ key, opts, label }) => (
             <select
               key={key}
               value={filter[key]}
-              onChange={(e) => setFilter({ ...filter, [key]: e.target.value })}
-              className="border border-[#e8d9cc] rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#d4b86a]"
+              onChange={e => setFilter({ ...filter, [key]: e.target.value })}
+              className="border border-[#e8d9cc] rounded-full px-4 py-2 text-sm
+                focus:outline-none focus:border-[#d4b86a]"
             >
               <option value="">{label}</option>
-              {opts.map((o) => (
-                <option key={o} value={o}>
-                  {o}
-                </option>
-              ))}
+              {opts.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           ))}
         </div>
-        <a
-          href={`${API}/api/bookings/export?token=${localStorage.getItem("viola_token")}`}
+        {/* ✅ Fixed export URL */}
+        <a  href={`${API}/api/bookings/export?token=${localStorage.getItem("viola_token")}`}
           target="_blank"
-          className="px-5 py-2 rounded-full bg-[#1a1a1a] text-white text-sm hover:bg-gray-800 transition"
+          rel="noreferrer"
+          className="px-5 py-2 rounded-full bg-[#1a1a1a] text-white text-sm
+            hover:bg-gray-800 transition"
         >
-          Export CSV ↓
-        </a>
+          Export CSV ↓</a>
+         
       </div>
 
       {/* Table */}
@@ -159,23 +160,19 @@ const BookingsTab = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[#fdf6e3] border-b border-[#f0e6dd]">
-                  {["Client", "Category", "Package", "Date", "Status", ""].map(
-                    (h) => (
-                      <th
-                        key={h}
-                        className="text-left px-4 py-3 text-xs font-semibold text-[#7c5546] uppercase tracking-wider"
-                      >
-                        {h}
-                      </th>
-                    ),
-                  )}
+                  {["Client","Category","Package","Date","Status",""].map(h => (
+                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold
+                      text-[#7c5546] uppercase tracking-wider">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((b, i) => (
-                  <tr
-                    key={b._id}
-                    className={`border-b border-[#f0e6dd] hover:bg-[#fdf6e3] transition ${i % 2 ? "bg-gray-50/30" : ""}`}
+                  <tr key={b._id}
+                    className={`border-b border-[#f0e6dd] hover:bg-[#fdf6e3]
+                      transition ${i % 2 ? "bg-gray-50/30" : ""}`}
                   >
                     <td className="px-4 py-3">
                       <p className="font-medium text-[#1a1a1a]">
@@ -190,9 +187,7 @@ const BookingsTab = () => {
                     <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                       {b.date}
                     </td>
-                    <td className="px-4 py-3">
-                      <Badge status={b.status} />
-                    </td>
+                    <td className="px-4 py-3"><Badge status={b.status} /></td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => setSelected(b)}
@@ -216,8 +211,10 @@ const BookingsTab = () => {
 
       {/* Detail modal */}
       {selected && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50
+          flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl w-full max-w-md
+            max-h-[90vh] overflow-y-auto">
             <GoldBar />
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-start">
@@ -241,26 +238,19 @@ const BookingsTab = () => {
 
               <div className="bg-[#fdf6e3] rounded-xl p-4 space-y-2.5 text-sm">
                 {[
-                  ["Category", selected.category],
-                  ["Package", selected.package],
-                  ["Date", selected.date],
-                  ["Location", selected.location],
-                  ["People", selected.numberOfPeople],
-                  ["Notes", selected.notes],
-                  [
-                    "Submitted",
-                    new Date(selected.createdAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    }),
-                  ],
+                  ["Category",  selected.category],
+                  ["Package",   selected.package],
+                  ["Date",      selected.date],
+                  ["Location",  selected.location],
+                  ["People",    selected.numberOfPeople],
+                  ["Notes",     selected.notes],
+                  ["Submitted", new Date(selected.createdAt).toLocaleDateString("en-GB", {
+                    day: "numeric", month: "long", year: "numeric",
+                  })],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-4">
                     <span className="text-gray-400 flex-shrink-0">{k}</span>
-                    <span className="font-medium text-[#1a1a1a] text-right">
-                      {v}
-                    </span>
+                    <span className="font-medium text-[#1a1a1a] text-right">{v}</span>
                   </div>
                 ))}
               </div>
@@ -269,13 +259,15 @@ const BookingsTab = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => updateStatus(selected._id, "confirmed")}
-                    className="flex-1 py-2.5 rounded-full bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
+                    className="flex-1 py-2.5 rounded-full bg-green-600 text-white
+                      text-sm font-medium hover:bg-green-700 transition"
                   >
                     ✓ Confirm
                   </button>
                   <button
                     onClick={() => updateStatus(selected._id, "declined")}
-                    className="flex-1 py-2.5 rounded-full bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition"
+                    className="flex-1 py-2.5 rounded-full bg-red-500 text-white
+                      text-sm font-medium hover:bg-red-600 transition"
                   >
                     ✕ Decline
                   </button>
@@ -283,23 +275,24 @@ const BookingsTab = () => {
               )}
 
               <div className="flex gap-3">
-                <a
-                  href={`mailto:${selected.email}`}
-                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a] text-[#7c5546] text-sm text-center font-medium hover:bg-[#fdf6e3] transition"
-                >
+                <a href={`mailto:${selected.email}`}
+                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a]
+                    text-[#7c5546] text-sm text-center font-medium
+                    hover:bg-[#fdf6e3] transition">
                   Email Client
                 </a>
-                <a
-                  href={`tel:${selected.phone}`}
-                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a] text-[#7c5546] text-sm text-center font-medium hover:bg-[#fdf6e3] transition"
-                >
+                <a href={`tel:${selected.phone}`}
+                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a]
+                    text-[#7c5546] text-sm text-center font-medium
+                    hover:bg-[#fdf6e3] transition">
                   Call Client
                 </a>
               </div>
 
               <button
                 onClick={() => remove(selected._id)}
-                className="w-full py-2.5 rounded-full border border-red-200 text-red-500 text-sm hover:bg-red-50 transition"
+                className="w-full py-2.5 rounded-full border border-red-200
+                  text-red-500 text-sm hover:bg-red-50 transition"
               >
                 Delete Booking
               </button>
@@ -320,36 +313,42 @@ const RatesTab = () => {
   const [saved,    setSaved]    = useState(false);
 
   useEffect(() => {
-    fetch(`/api/rates/${category}`)
+    // ✅ Fixed — uses API variable
+    fetch(`${API}/api/rates/${category}`)
       .then(r => r.json())
-      .then(d => setPackages(d?.packages || []));
+      .then(d => setPackages(d?.packages || []))
+      .catch(() => setPackages([]));
   }, [category]);
 
-  const add    = ()      => setPackages([...packages, { name: "", price: "" }]);
-  const remove = (i)     => setPackages(packages.filter((_, idx) => idx !== i));
+  const add    = ()        => setPackages([...packages, { name: "", price: "" }]);
+  const remove = (i)       => setPackages(packages.filter((_, idx) => idx !== i));
   const update = (i, f, v) =>
     setPackages(packages.map((p, idx) => idx === i ? { ...p, [f]: v } : p));
 
   const save = async () => {
     setSaving(true);
-    await fetch(`${API}/api/rates/${category}`, {
-      method: "PUT",
-      headers: authHeaders,
-      body: JSON.stringify({ packages }),
-    });
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await fetch(`${API}/api/rates/${category}`, {
+        method:  "PUT",
+        headers: authHeaders,
+        body:    JSON.stringify({ packages }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error("Save failed:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="space-y-5">
-      {/* Category tabs */}
       <div className="flex gap-2 flex-wrap">
         {[
-          { id: "bridal",   label: "💍 Bridal"       },
-          { id: "glam",     label: "✨ Glam Sessions" },
-          { id: "courses",  label: "🎓 Courses"       },
+          { id: "bridal",  label: "💍 Bridal"       },
+          { id: "glam",    label: "✨ Glam Sessions" },
+          { id: "courses", label: "🎓 Courses"       },
         ].map(c => (
           <button key={c.id} onClick={() => setCategory(c.id)}
             className={`px-5 py-2 rounded-full text-sm font-medium transition ${
@@ -369,7 +368,8 @@ const RatesTab = () => {
             {category} Packages
           </h3>
           <button onClick={add}
-            className="text-sm px-4 py-1.5 rounded-full border border-[#d4b86a] text-[#7c5546] hover:bg-[#fdf6e3] transition">
+            className="text-sm px-4 py-1.5 rounded-full border border-[#d4b86a]
+              text-[#7c5546] hover:bg-[#fdf6e3] transition">
             + Add
           </button>
         </div>
@@ -377,12 +377,14 @@ const RatesTab = () => {
         <div className="space-y-3">
           {packages.map((pkg, i) => (
             <div key={i} className="flex gap-3 items-center">
-              <input value={pkg.name}
+              <input
+                value={pkg.name}
                 onChange={e => update(i, "name", e.target.value)}
                 placeholder="Package name"
                 className={`${inputCls} flex-1`}
               />
-              <input value={pkg.price}
+              <input
+                value={pkg.price}
                 onChange={e => update(i, "price", e.target.value)}
                 placeholder="GHS price"
                 className={`${inputCls} w-36`}
@@ -393,7 +395,6 @@ const RatesTab = () => {
               </button>
             </div>
           ))}
-
           {!packages.length && (
             <p className="text-sm text-gray-400 text-center py-4">
               No packages yet — click "+ Add" to start
@@ -402,7 +403,8 @@ const RatesTab = () => {
         </div>
 
         <button onClick={save} disabled={saving}
-          className="w-full mt-5 py-3 rounded-full bg-black text-white text-sm font-medium hover:bg-gray-800 transition disabled:opacity-50">
+          className="w-full mt-5 py-3 rounded-full bg-black text-white text-sm
+            font-medium hover:bg-gray-800 transition disabled:opacity-50">
           {saving ? "Saving..." : saved ? "✓ Saved!" : "Save Changes"}
         </button>
       </Card>
@@ -417,20 +419,26 @@ const ActivityTab = () => {
   const [stats,    setStats]    = useState(null);
 
   useEffect(() => {
+    // ✅ Fixed — was using string literal "${API}" instead of template literal
     Promise.all([
-      fetch("${API}/api/activity", { headers: authHeaders }).then((r) =>
-        r.json(),
-      ),
-      fetch("${API}/api/activity/stats", { headers: authHeaders }).then((r) =>
-        r.json(),
-      ),
-    ]).then(([a, s]) => {
-      setActivity(a);
-      setStats(s);
-    });
+      fetch(`${API}/api/activity`,       { headers: authHeaders }).then(r => r.json()),
+      fetch(`${API}/api/activity/stats`, { headers: authHeaders }).then(r => r.json()),
+    ])
+      .then(([a, s]) => {
+        setActivity(Array.isArray(a) ? a : []);
+        setStats(s);
+      })
+      .catch(console.error);
   }, []);
 
-  const icons = { booking: "📋", rate_update: "✏️", email_sent: "📧", auth: "🔐" };
+  const icons = {
+    booking:     "📋",
+    rate_update: "✏️",
+    email_sent:  "📧",
+    auth:        "🔐",
+    reminder:    "🔔",
+    user:        "👤",
+  };
 
   return (
     <div className="space-y-6">
@@ -445,7 +453,8 @@ const ActivityTab = () => {
 
       {stats?.byCategory?.length > 0 && (
         <Card>
-          <p className="text-xs font-semibold text-[#d4b86a] uppercase tracking-wider mb-4">
+          <p className="text-xs font-semibold text-[#d4b86a] uppercase
+            tracking-wider mb-4">
             Bookings by Category
           </p>
           <div className="space-y-3">
@@ -457,7 +466,8 @@ const ActivityTab = () => {
                 </div>
                 <div className="h-2 bg-[#f0e6dd] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#d4b86a] to-[#7c5546] rounded-full transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-[#d4b86a] to-[#7c5546]
+                      rounded-full transition-all duration-500"
                     style={{ width: `${(count / stats.total) * 100}%` }}
                   />
                 </div>
@@ -468,27 +478,33 @@ const ActivityTab = () => {
       )}
 
       <Card>
-        <p className="text-xs font-semibold text-[#d4b86a] uppercase tracking-wider mb-4">
+        <p className="text-xs font-semibold text-[#d4b86a] uppercase
+          tracking-wider mb-4">
           Activity Feed
         </p>
         <div className="space-y-1">
           {activity.map(a => (
             <div key={a._id}
-              className="flex items-start gap-3 py-2.5 border-b border-[#f0e6dd] last:border-0">
-              <span className="text-lg flex-shrink-0 mt-0.5">{icons[a.type] || "•"}</span>
+              className="flex items-start gap-3 py-2.5 border-b
+                border-[#f0e6dd] last:border-0">
+              <span className="text-lg flex-shrink-0 mt-0.5">
+                {icons[a.type] || "•"}
+              </span>
               <div>
                 <p className="text-sm text-[#1a1a1a]">{a.message}</p>
                 <p className="text-xs text-gray-400 mt-0.5">
                   {new Date(a.createdAt).toLocaleDateString("en-GB", {
-                    day:"numeric",month:"short",year:"numeric",
-                    hour:"2-digit",minute:"2-digit"
+                    day: "numeric", month: "short", year: "numeric",
+                    hour: "2-digit", minute: "2-digit",
                   })}
                 </p>
               </div>
             </div>
           ))}
           {!activity.length && (
-            <p className="text-sm text-gray-400 text-center py-6">No activity yet</p>
+            <p className="text-sm text-gray-400 text-center py-6">
+              No activity yet
+            </p>
           )}
         </div>
       </Card>
@@ -496,42 +512,37 @@ const ActivityTab = () => {
   );
 };
 
-// ── Settings Tab — add alongside BookingsTab, RatesTab, ActivityTab ──
+// ── Settings Tab ──
 const SettingsTab = () => {
   const { authHeaders } = useApi();
-  const [form, setForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirm: "",
+  const [form,    setForm]    = useState({
+    currentPassword: "", newPassword: "", confirm: "",
   });
-  const [msg, setMsg] = useState("");
-  const [error, setError] = useState("");
+  const [msg,     setMsg]     = useState("");
+  const [error,   setError]   = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = async () => {
-    setMsg("");
-    setError("");
+    setMsg(""); setError("");
     if (form.newPassword !== form.confirm) {
-      setError("New passwords don't match.");
-      return;
+      setError("Passwords don't match."); return;
     }
     if (form.newPassword.length < 8) {
-      setError("Password must be at least 8 characters.");
-      return;
+      setError("Min 8 characters."); return;
     }
     setLoading(true);
     try {
-      const res = await fetch(`${API}/api/auth/change-password`, {
-        method: "POST",
+      const res  = await fetch(`${API}/api/auth/change-password`, {
+        method:  "POST",
         headers: authHeaders,
-        body: JSON.stringify({
+        body:    JSON.stringify({
           currentPassword: form.currentPassword,
-          newPassword: form.newPassword,
+          newPassword:     form.newPassword,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      setMsg("Password updated successfully ✅");
+      setMsg("Password updated ✅");
       setForm({ currentPassword: "", newPassword: "", confirm: "" });
     } catch (err) {
       setError(err.message);
@@ -546,43 +557,34 @@ const SettingsTab = () => {
         <h3 className="font-semibold text-[#1a1a1a] mb-4">Change Password</h3>
         <div className="space-y-3">
           {[
-            {
-              key: "currentPassword",
-              label: "Current Password",
-              placeholder: "Enter current password",
-            },
-            {
-              key: "newPassword",
-              label: "New Password",
-              placeholder: "Min 8 characters",
-            },
-            {
-              key: "confirm",
-              label: "Confirm New Password",
-              placeholder: "Repeat new password",
-            },
+            { key: "currentPassword", label: "Current Password", placeholder: "Enter current password" },
+            { key: "newPassword",     label: "New Password",      placeholder: "Min 8 characters"      },
+            { key: "confirm",         label: "Confirm Password",  placeholder: "Repeat new password"   },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <label className="text-xs font-semibold text-[#7c5546] uppercase tracking-wider mb-1.5 block">
+              <label className="text-xs font-semibold text-[#7c5546] uppercase
+                tracking-wider mb-1.5 block">
                 {label}
               </label>
               <input
                 type="password"
                 placeholder={placeholder}
                 value={form[key]}
-                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                className="w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#d4b86a]"
+                onChange={e => setForm({ ...form, [key]: e.target.value })}
+                className="w-full border border-[#e8d9cc] rounded-full px-5 py-3
+                  text-sm focus:outline-none focus:border-[#d4b86a]"
               />
             </div>
           ))}
 
           {error && <p className="text-red-500 text-xs">{error}</p>}
-          {msg && <p className="text-green-600 text-xs">{msg}</p>}
+          {msg   && <p className="text-green-600 text-xs">{msg}</p>}
 
           <button
             onClick={handleChange}
             disabled={loading}
-            className="w-full py-3 rounded-full bg-black text-white text-sm font-medium hover:bg-gray-800 transition disabled:opacity-50 mt-2"
+            className="w-full py-3 rounded-full bg-black text-white text-sm
+              font-medium hover:bg-gray-800 transition disabled:opacity-50 mt-2"
           >
             {loading ? "Updating..." : "Update Password"}
           </button>
@@ -594,38 +596,34 @@ const SettingsTab = () => {
 
 // ── Main Dashboard ──
 export default function Dashboard() {
-  const [tab, setTab] = useState("bookings");
-  const navigate      = useNavigate();
+  const [tab,         setTab]         = useState("bookings");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
   const { token, user, isAdmin, logout } = useAuth();
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    if (user && !isAdmin) {
-      navigate("/dashboard");
-    } // redirect regular users
+    if (!token)            { navigate("/login");     return; }
+    if (user && !isAdmin)  { navigate("/dashboard"); return; }
   }, [token, user, isAdmin]);
 
   const handleLogout = () => {
-    logout(); // ✅ use unified logout
+    logout();
     navigate("/login");
   };
 
- 
-
   const tabs = [
     { id: "bookings", label: "📋 Bookings" },
-    { id: "rates", label: "💰 Rates" },
+    { id: "rates",    label: "💰 Rates"    },
     { id: "activity", label: "📊 Activity" },
-    { id: "settings", label: "⚙️ Settings" }, // ✅ add this
+    { id: "settings", label: "⚙️ Settings" },
   ];
 
   return (
     <div className="min-h-screen bg-[#fff8f5]">
+
       {/* Top nav */}
-      <div className="bg-[#1a1a1a] px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+      <div className="bg-[#1a1a1a] px-6 py-4 flex items-center justify-between
+        sticky top-0 z-40">
         <div>
           <p className="text-[#d4b86a] text-xs tracking-[3px] uppercase">
             Viola Beauty
@@ -634,22 +632,36 @@ export default function Dashboard() {
             Admin Dashboard
           </h1>
         </div>
-        <button
-          onClick={logout}
-          className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-full transition"
-        >
-          Sign Out
-        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex items-center gap-1.5 text-xs text-gray-300
+              hover:text-white border border-gray-700 hover:border-[#d4b86a]
+              px-3 py-2 rounded-full transition"
+          >
+            <span>📊</span>
+            <span className="hidden sm:block">Analytics</span>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="text-xs text-gray-400 hover:text-white border
+              border-gray-700 hover:border-gray-500 px-4 py-2 rounded-full transition"
+          >
+            Sign Out
+          </button>
+        </div>
       </div>
+
       <div className="h-0.5 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Tab bar */}
-        <div className="flex gap-1 mb-8 bg-white border border-[#e8d9cc] rounded-full p-1 w-fit">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+        <div className="flex gap-1 mb-8 bg-white border border-[#e8d9cc]
+          rounded-full p-1 w-fit">
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
               className={`px-5 py-2 rounded-full text-sm font-medium transition ${
                 tab === t.id
                   ? "bg-[#1a1a1a] text-white"
@@ -662,10 +674,17 @@ export default function Dashboard() {
         </div>
 
         {tab === "bookings" && <BookingsTab />}
-        {tab === "rates" && <RatesTab />}
+        {tab === "rates"    && <RatesTab    />}
         {tab === "activity" && <ActivityTab />}
         {tab === "settings" && <SettingsTab />}
       </div>
+
+      {/* ✅ Sidebar moved OUTSIDE the content div, at root level */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
     </div>
   );
 }

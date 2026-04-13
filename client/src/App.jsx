@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Ratecard from "./pages/ratecard";
 import Portfolio from "./pages/portfolio";
 import About from "./pages/about";
@@ -85,11 +85,13 @@ const PageLoader = () => (
 );
 
 const App = () => {
+  const location = useLocation
+  const isAdmin = location('/admin')
   return (
     <AuthProvider>
       <BookingProvider>
         <div className="overflow-x-hidden">
-          <Navbar />
+          {!isAdmin && <Navbar />}
           <Routes>
             <Route
               path="/"
