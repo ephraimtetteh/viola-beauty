@@ -1,12 +1,8 @@
 import { useState } from "react";
-import emailjs from "@emailjs/browser";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import AuthPrompt from "./auth/AuthPrompt";
 
-const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
-const CLIENT_TEMPLATE_ID = "template_booking_client";
-const VIOLA_TEMPLATE_ID = "template_booking_viola";
+const API = import.meta.env.VITE_API_URL;
 
 const SERVICE_PACKAGES = {
   Bridal: {
@@ -62,7 +58,6 @@ const inputClass =
 const labelClass =
   "text-xs font-semibold text-[#7c5546] uppercase tracking-wider mb-1.5 block";
 
-// ── Reusable form component ──
 export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
   const [step, setStep] = useState(defaultCategory ? 2 : 1);
   const [form, setForm] = useState({
@@ -110,34 +105,30 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
     }
     setLoading(true);
 
-    const templateData = {
-      first_name: form.firstName,
-      last_name: form.lastName,
-      client_email: form.email,
-      phone: form.phone,
-      preferred_date: form.date,
-      location: form.location || "Not specified",
-      number_of_people: form.numberOfPeople || "Not specified",
-      notes: form.notes || "None",
-      service_category: form.category,
-      package: form.package,
-    };
-
     try {
-      await Promise.allSettled([
-        emailjs.send(
-          "service_zlwibi9",
-          "template_zm7hgsk",
-          templateData,
-          "7_X7BAG6U_84kyg5T",
-        ),
-        emailjs.send(
-          EMAILJS_SERVICE_ID,
-          VIOLA_TEMPLATE_ID,
-          templateData,
-          "7_X7BAG6U_84kyg5T",
-        ),
-      ]);
+      // ✅ POST to backend — Nodemailer handles both emails
+      const res = await fetch(`${API}/api/bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          date: form.date,
+          location: form.location || "Not specified",
+          numberOfPeople: form.numberOfPeople || "Not specified",
+          notes: form.notes || "None",
+          category: form.category,
+          package: form.package,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Booking failed");
+      }
+
       setStep(3);
       onSuccess?.();
     } catch (err) {
@@ -161,7 +152,8 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
             onClick={() => selectCategory(cat)}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
-            className="w-full bg-white border border-[#e8d9cc] hover:border-[#d4b86a] hover:shadow-md rounded-2xl p-5 text-left transition-all duration-300 group overflow-hidden"
+            className="w-full bg-white border border-[#e8d9cc] hover:border-[#d4b86a]
+              hover:shadow-md rounded-2xl p-5 text-left transition-all duration-300 group"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -201,7 +193,6 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
           hours.
         </p>
 
-        {/* Summary */}
         <div className="bg-[#fdf6e3] border border-[#d4b86a]/30 rounded-2xl p-5 text-left space-y-2">
           <p className="text-xs font-semibold text-[#d4b86a] uppercase tracking-wider mb-3">
             Booking Summary
@@ -237,6 +228,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
           </p>
           <p className="text-xs text-[#d4b86a] mt-1">— Viola's Secrets</p>
         </div>
+
         <AuthPrompt from="/dashboard" />
       </motion.div>
     );
@@ -251,7 +243,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
         <div className="p-5">
           <label className={labelClass}>Select Package *</label>
           <div className="grid gap-2 mt-2">
-            {SERVICE_PACKAGES[form.category].packages.map((pkg) => (
+            {SERVICE_PACKAGES[form.category]?.packages.map((pkg) => (
               <button
                 key={pkg}
                 onClick={() => update("package", pkg)}
@@ -274,7 +266,6 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
         <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" />
         <div className="p-5 space-y-4">
           <h3 className="font-semibold text-[#1a1a1a]">Personal Details</h3>
-
           <div className="flex gap-3">
             <div className="w-1/2">
               <label className={labelClass}>First Name *</label>
@@ -297,7 +288,6 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
               />
             </div>
           </div>
-
           <div>
             <label className={labelClass}>Email Address *</label>
             <input
@@ -308,7 +298,6 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
               className={inputClass}
             />
           </div>
-
           <div>
             <label className={labelClass}>Phone Number *</label>
             <input
@@ -327,7 +316,6 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
         <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" />
         <div className="p-5 space-y-4">
           <h3 className="font-semibold text-[#1a1a1a]">Event Details</h3>
-
           <div>
             <label className={labelClass}>Preferred Date *</label>
             <input
@@ -338,18 +326,16 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
               className={inputClass}
             />
           </div>
-
           <div>
             <label className={labelClass}>Location / Venue</label>
             <input
               type="text"
-              placeholder="e.g. East Legon, Accra or venue name"
+              placeholder="e.g. East Legon, Accra"
               value={form.location}
               onChange={(e) => update("location", e.target.value)}
               className={inputClass}
             />
           </div>
-
           {form.category === "Bridal" && (
             <div>
               <label className={labelClass}>Number of People</label>
@@ -357,27 +343,28 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
                 type="number"
                 placeholder="e.g. 4 (bride + bridesmaids)"
                 value={form.numberOfPeople}
-                onChange={(e) => update("numberOfPeople", e.target.value)}
                 min="1"
+                onChange={(e) => update("numberOfPeople", e.target.value)}
                 className={inputClass}
               />
             </div>
           )}
-
           <div>
             <label className={labelClass}>Special Requests / Notes</label>
             <textarea
-              placeholder="Any specific requirements, skin concerns, or notes..."
+              placeholder="Any specific requirements or notes..."
               value={form.notes}
-              onChange={(e) => update("notes", e.target.value)}
               rows={3}
-              className="w-full border border-[#e8d9cc] rounded-2xl px-5 py-3 text-sm focus:outline-none focus:border-[#d4b86a] bg-white text-gray-700 placeholder-gray-400 transition resize-none"
+              onChange={(e) => update("notes", e.target.value)}
+              className="w-full border border-[#e8d9cc] rounded-2xl px-5 py-3 text-sm
+                focus:outline-none focus:border-[#d4b86a] bg-white placeholder-gray-400
+                transition resize-none"
             />
           </div>
         </div>
       </div>
 
-      {/* Booking summary */}
+      {/* Summary */}
       <div className="bg-[#fdf6e3] border border-[#d4b86a]/30 rounded-2xl p-4">
         <p className="text-xs font-semibold text-[#d4b86a] uppercase tracking-wider mb-3">
           Booking Summary
@@ -409,25 +396,29 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
 
       {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-      {/* Actions */}
       <div className="flex gap-3">
         <button
           onClick={() => {
             setStep(1);
             setError("");
           }}
-          className="w-1/3 px-4 py-3 rounded-full border border-gray-300 text-gray-500 text-sm hover:bg-gray-50 transition"
+          className="w-1/3 px-4 py-3 rounded-full border border-gray-300
+            text-gray-500 text-sm hover:bg-gray-50 transition"
         >
           ← Back
         </button>
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-2/3 px-6 py-3 rounded-full bg-black text-white font-medium hover:bg-gray-800 transition disabled:opacity-50 text-sm"
+          className="w-2/3 px-6 py-3 rounded-full bg-black text-white font-medium
+            hover:bg-gray-800 transition disabled:opacity-50 text-sm"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span
+                className="w-4 h-4 border-2 border-white/30 border-t-white
+                rounded-full animate-spin"
+              />
               Sending...
             </span>
           ) : (

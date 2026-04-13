@@ -4,8 +4,9 @@ import { useAuth } from "../../context/AuthContext";
 
 // ── API helper ──
 // ── Replace the existing useApi hook with this ──
+const API = import.meta.env.VITE_API_URL; // ✅ full backend URL
+
 const useApi = () => {
-  // ✅ Use the same token key as AuthContext
   const token = localStorage.getItem("viola_token");
   return {
     token,
@@ -67,7 +68,9 @@ const BookingsTab = () => {
     const p = new URLSearchParams(
       Object.fromEntries(Object.entries(filter).filter(([, v]) => v)),
     );
-    const res = await fetch(`/api/bookings?${p}`, { headers: authHeaders });
+    const res = await fetch(`${API}/api/bookings?${p}`, {
+      headers: authHeaders,
+    });
     setBookings(await res.json());
     setLoading(false);
   };
@@ -78,20 +81,25 @@ const BookingsTab = () => {
   }, [filter]);
 
   const updateStatus = async (id, status) => {
-    await fetch(`/api/bookings/${id}/status`, {
-      method: "PATCH", headers: authHeaders,
+    await fetch(`${API}/api/bookings/${id}/status`, {
+      method: "PATCH",
+      headers: authHeaders,
       body: JSON.stringify({ status }),
     });
     setSelected(null);
-    fetch_();
+    fetchBookings(); // ✅ was fetch_()
   };
 
   const remove = async (id) => {
     if (!confirm("Delete this booking?")) return;
-    await fetch(`/api/bookings/${id}`, { method: "DELETE", headers: authHeaders });
+    await fetch(`${API}/api/bookings/${id}`, {
+      method: "DELETE",
+      headers: authHeaders,
+    });
     setSelected(null);
-    fetch_();
+    fetchBookings(); // ✅ was fetch_()
   };
+  
 
   return (
     <div className="space-y-5">
@@ -99,31 +107,45 @@ const BookingsTab = () => {
       <div className="flex flex-wrap gap-3 justify-between items-center">
         <div className="flex gap-3 flex-wrap">
           <input
-            type="text" placeholder="Search..."
+            type="text"
+            placeholder="Search..."
             value={filter.search}
-            onChange={e => setFilter({ ...filter, search: e.target.value })}
+            onChange={(e) => setFilter({ ...filter, search: e.target.value })}
             className="border border-[#e8d9cc] rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#d4b86a] w-52"
           />
           {[
-            { key: "status",   opts: ["pending","confirmed","declined"], label: "All Status" },
-            { key: "category", opts: ["Bridal","Glam Sessions","Classes"], label: "All Categories" },
+            {
+              key: "status",
+              opts: ["pending", "confirmed", "declined"],
+              label: "All Status",
+            },
+            {
+              key: "category",
+              opts: ["Bridal", "Glam Sessions", "Classes"],
+              label: "All Categories",
+            },
           ].map(({ key, opts, label }) => (
-            <select key={key}
+            <select
+              key={key}
               value={filter[key]}
-              onChange={e => setFilter({ ...filter, [key]: e.target.value })}
+              onChange={(e) => setFilter({ ...filter, [key]: e.target.value })}
               className="border border-[#e8d9cc] rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#d4b86a]"
             >
               <option value="">{label}</option>
-              {opts.map(o => <option key={o} value={o}>{o}</option>)}
+              {opts.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
             </select>
           ))}
         </div>
-        <a   href="/api/bookings/export"
+        <a
+          href={`${API}/api/bookings/export?token=${localStorage.getItem("viola_token")}`}
           target="_blank"
           className="px-5 py-2 rounded-full bg-[#1a1a1a] text-white text-sm hover:bg-gray-800 transition"
         >
           Export CSV ↓
-        
         </a>
       </div>
 
@@ -137,29 +159,45 @@ const BookingsTab = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-[#fdf6e3] border-b border-[#f0e6dd]">
-                  {["Client","Category","Package","Date","Status",""].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#7c5546] uppercase tracking-wider">
-                      {h}
-                    </th>
-                  ))}
+                  {["Client", "Category", "Package", "Date", "Status", ""].map(
+                    (h) => (
+                      <th
+                        key={h}
+                        className="text-left px-4 py-3 text-xs font-semibold text-[#7c5546] uppercase tracking-wider"
+                      >
+                        {h}
+                      </th>
+                    ),
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((b, i) => (
-                  <tr key={b._id}
+                  <tr
+                    key={b._id}
                     className={`border-b border-[#f0e6dd] hover:bg-[#fdf6e3] transition ${i % 2 ? "bg-gray-50/30" : ""}`}
                   >
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#1a1a1a]">{b.firstName} {b.lastName}</p>
+                      <p className="font-medium text-[#1a1a1a]">
+                        {b.firstName} {b.lastName}
+                      </p>
                       <p className="text-xs text-gray-400">{b.email}</p>
                     </td>
                     <td className="px-4 py-3 text-gray-600">{b.category}</td>
-                    <td className="px-4 py-3 text-gray-600 max-w-[160px] truncate">{b.package}</td>
-                    <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{b.date}</td>
-                    <td className="px-4 py-3"><Badge status={b.status} /></td>
+                    <td className="px-4 py-3 text-gray-600 max-w-[160px] truncate">
+                      {b.package}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                      {b.date}
+                    </td>
                     <td className="px-4 py-3">
-                      <button onClick={() => setSelected(b)}
-                        className="text-[#d4b86a] hover:text-[#7c5546] text-xs font-medium">
+                      <Badge status={b.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => setSelected(b)}
+                        className="text-[#d4b86a] hover:text-[#7c5546] text-xs font-medium"
+                      >
                         View →
                       </button>
                     </td>
@@ -168,7 +206,9 @@ const BookingsTab = () => {
               </tbody>
             </table>
             {!bookings.length && (
-              <p className="text-center py-12 text-gray-400 text-sm">No bookings found</p>
+              <p className="text-center py-12 text-gray-400 text-sm">
+                No bookings found
+              </p>
             )}
           </div>
         )}
@@ -189,8 +229,12 @@ const BookingsTab = () => {
                     {selected.email} · {selected.phone}
                   </p>
                 </div>
-                <button onClick={() => setSelected(null)}
-                  className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+                <button
+                  onClick={() => setSelected(null)}
+                  className="text-gray-400 hover:text-gray-600 text-xl"
+                >
+                  ✕
+                </button>
               </div>
 
               <Badge status={selected.status} />
@@ -198,48 +242,65 @@ const BookingsTab = () => {
               <div className="bg-[#fdf6e3] rounded-xl p-4 space-y-2.5 text-sm">
                 {[
                   ["Category", selected.category],
-                  ["Package",  selected.package],
-                  ["Date",     selected.date],
+                  ["Package", selected.package],
+                  ["Date", selected.date],
                   ["Location", selected.location],
-                  ["People",   selected.numberOfPeople],
-                  ["Notes",    selected.notes],
-                  ["Submitted",new Date(selected.createdAt).toLocaleDateString("en-GB",{
-                    day:"numeric",month:"long",year:"numeric"
-                  })],
+                  ["People", selected.numberOfPeople],
+                  ["Notes", selected.notes],
+                  [
+                    "Submitted",
+                    new Date(selected.createdAt).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    }),
+                  ],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-4">
                     <span className="text-gray-400 flex-shrink-0">{k}</span>
-                    <span className="font-medium text-[#1a1a1a] text-right">{v}</span>
+                    <span className="font-medium text-[#1a1a1a] text-right">
+                      {v}
+                    </span>
                   </div>
                 ))}
               </div>
 
               {selected.status === "pending" && (
                 <div className="flex gap-3">
-                  <button onClick={() => updateStatus(selected._id, "confirmed")}
-                    className="flex-1 py-2.5 rounded-full bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition">
+                  <button
+                    onClick={() => updateStatus(selected._id, "confirmed")}
+                    className="flex-1 py-2.5 rounded-full bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
+                  >
                     ✓ Confirm
                   </button>
-                  <button onClick={() => updateStatus(selected._id, "declined")}
-                    className="flex-1 py-2.5 rounded-full bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition">
+                  <button
+                    onClick={() => updateStatus(selected._id, "declined")}
+                    className="flex-1 py-2.5 rounded-full bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition"
+                  >
                     ✕ Decline
                   </button>
                 </div>
               )}
 
               <div className="flex gap-3">
-                <a href={`mailto:${selected.email}`}
-                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a] text-[#7c5546] text-sm text-center font-medium hover:bg-[#fdf6e3] transition">
+                <a
+                  href={`mailto:${selected.email}`}
+                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a] text-[#7c5546] text-sm text-center font-medium hover:bg-[#fdf6e3] transition"
+                >
                   Email Client
                 </a>
-                <a href={`tel:${selected.phone}`}
-                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a] text-[#7c5546] text-sm text-center font-medium hover:bg-[#fdf6e3] transition">
+                <a
+                  href={`tel:${selected.phone}`}
+                  className="flex-1 py-2.5 rounded-full border border-[#d4b86a] text-[#7c5546] text-sm text-center font-medium hover:bg-[#fdf6e3] transition"
+                >
                   Call Client
                 </a>
               </div>
 
-              <button onClick={() => remove(selected._id)}
-                className="w-full py-2.5 rounded-full border border-red-200 text-red-500 text-sm hover:bg-red-50 transition">
+              <button
+                onClick={() => remove(selected._id)}
+                className="w-full py-2.5 rounded-full border border-red-200 text-red-500 text-sm hover:bg-red-50 transition"
+              >
                 Delete Booking
               </button>
             </div>
@@ -247,7 +308,7 @@ const BookingsTab = () => {
         </div>
       )}
     </div>
-  )
+  );
 };
 
 // ── Rates Tab ──
@@ -271,8 +332,9 @@ const RatesTab = () => {
 
   const save = async () => {
     setSaving(true);
-    await fetch(`/api/rates/${category}`, {
-      method: "PUT", headers: authHeaders,
+    await fetch(`${API}/api/rates/${category}`, {
+      method: "PUT",
+      headers: authHeaders,
       body: JSON.stringify({ packages }),
     });
     setSaving(false);
@@ -356,9 +418,16 @@ const ActivityTab = () => {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/activity",       { headers: authHeaders }).then(r => r.json()),
-      fetch("/api/activity/stats", { headers: authHeaders }).then(r => r.json()),
-    ]).then(([a, s]) => { setActivity(a); setStats(s); });
+      fetch("${API}/api/activity", { headers: authHeaders }).then((r) =>
+        r.json(),
+      ),
+      fetch("${API}/api/activity/stats", { headers: authHeaders }).then((r) =>
+        r.json(),
+      ),
+    ]).then(([a, s]) => {
+      setActivity(a);
+      setStats(s);
+    });
   }, []);
 
   const icons = { booking: "📋", rate_update: "✏️", email_sent: "📧", auth: "🔐" };

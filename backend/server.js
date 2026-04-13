@@ -8,9 +8,10 @@ import authRoutes from "./routes/auth.js";
 import bookingRoutes from "./routes/bookings.js";
 import rateRoutes from "./routes/rates.js";
 import activityRoutes from "./routes/activity.js";
-
+import userRoutes from "./routes/users.js";
 
 dotenv.config();
+
 const app = express();
 
 const allowedOrigins = [
@@ -23,7 +24,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, mobile apps)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -34,7 +34,6 @@ app.use(
   }),
 );
 
-
 app.use(express.json());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
@@ -42,7 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/rates", rateRoutes);
 app.use("/api/activity", activityRoutes);
-
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => res.json({ status: "Viola API ✅" }));
 

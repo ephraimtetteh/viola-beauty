@@ -1,6 +1,7 @@
-import emailjs from "@emailjs/browser";
 import { useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
+const API = import.meta.env.VITE_API_URL;
 
 const usePaystack = ({
   email,
@@ -10,6 +11,7 @@ const usePaystack = ({
   publicKey,
   currency,
   reference,
+  metadata,
   onSuccess,
   onClose,
 }) => {
@@ -20,22 +22,9 @@ const usePaystack = ({
       amount,
       currency,
       ref: reference,
-      firstname: firstName, // ✅ Paystack shows this on the payment popup
-      lastname: lastName, // ✅ Paystack shows this on the payment popup
-      metadata: {
-        custom_fields: [
-          {
-            display_name: "Customer Name",
-            variable_name: "customer_name",
-            value: `${firstName} ${lastName}`,
-          },
-          {
-            display_name: "Course",
-            variable_name: "course_name",
-            value: "", // filled in CheckoutPage below
-          },
-        ],
-      },
+      firstname: firstName,
+      lastname: lastName,
+      metadata,
       callback: (transaction) => {
         onSuccess(transaction);
       },
@@ -52,57 +41,55 @@ const CheckoutPage = () => {
 
   const reference = useRef(`viola_${course?.id}_${Date.now()}`);
 
-
+  // ── Send thank you email via backend Nodemailer ──
   const sendThankYouEmail = async (transaction) => {
     try {
-      await emailjs.send(
-        "Violabeauty_2025", // from emailjs.com dashboard
-        "template_lkz0m7v", // from emailjs.com dashboard
-        {
-          to_email: email,
-          first_name: firstName,
-          last_name: lastName,
-          course_name: course.name,
-          course_level: course.level,
+      await fetch(`${API}/api/users/course-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          firstName,
+          lastName,
+          courseName: course.name,
+          courseLevel: course.level,
           reference: transaction.reference,
-        },
-        "7_X7BAG6U_84kyg5T", // from emailjs.com Account → API Keys
-      );
-      console.log("Email sent ✅");
+        }),
+      });
     } catch (err) {
-      console.error("EmailJS failed:", err);
+      console.error("Course email failed:", err);
     }
   };
-  
+
   const handleSuccess = async (transaction) => {
     await Promise.allSettled([
+      // Zapier — Thinkific enrollment
       fetch(course.zapUrl, {
         method: "POST",
         body: JSON.stringify({
-          email, firstName, lastName,
-          courseName:        course.name,
-          courseId:          course.id,
+          email,
+          firstName,
+          lastName,
+          courseName: course.name,
+          courseId: course.id,
           thinkificCourseId: course.thinkificId,
-          reference:         transaction.reference,
+          reference: transaction.reference,
         }),
       }),
-      sendThankYouEmail(transaction),   // ✅ runs in parallel with Zapier
+      // Nodemailer — thank you email
+      sendThankYouEmail(transaction),
     ]);
-  
     navigate("/success", { state: { course, firstName } });
   };
 
   const initializePayment = usePaystack({
     email,
-    firstName, // ✅ passed into hook
-    lastName, // ✅ passed into hook
+    firstName,
+    lastName,
     amount: course?.price,
     publicKey: "pk_live_53d3cf9af7f266671480f5f4ee22538e8d268aca",
     currency: "GHS",
     reference: reference.current,
-    onSuccess: handleSuccess,
-    onClose: () => console.log("Payment closed"),
-    // ✅ override metadata here with actual course name
     metadata: {
       custom_fields: [
         {
@@ -117,6 +104,8 @@ const CheckoutPage = () => {
         },
       ],
     },
+    onSuccess: handleSuccess,
+    onClose: () => console.log("Payment closed"),
   });
 
   if (!course || !email) {
@@ -159,14 +148,16 @@ const CheckoutPage = () => {
 
         <button
           onClick={initializePayment}
-          className="w-full px-6 py-3 rounded-full bg-black text-white font-medium hover:bg-gray-800 transition"
+          className="w-full px-6 py-3 rounded-full bg-black text-white font-medium
+            hover:bg-gray-800 transition"
         >
           Pay Now
         </button>
 
         <button
           onClick={() => navigate(-1)}
-          className="w-full px-6 py-2 rounded-full border border-gray-300 text-gray-500 text-sm hover:bg-gray-50 transition"
+          className="w-full px-6 py-2 rounded-full border border-gray-300
+            text-gray-500 text-sm hover:bg-gray-50 transition"
         >
           ← Go Back
         </button>
