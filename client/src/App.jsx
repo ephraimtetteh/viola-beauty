@@ -11,6 +11,7 @@ import CheckoutPage from "./pages/checkout";
 import SuccessPage from "./pages/success";
 import { BookingProvider } from "./context/BookingContext";
 import BookingPage from "./pages/booking";
+import ClassRegistration from "./pages/ClassRegistration";
 
 import AdminSetup from "./pages/admin/Setup";
 import AdminLogin from "./pages/admin/Login";
@@ -19,7 +20,8 @@ import Dashboard from "./pages/admin/Dashboard";
 import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-// import UserDashboard from "./pages/UserDashboard";
+import UserDashboard from "./pages/UserDashboard";
+import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 
 
 const Education = lazy(() => import("./pages/education"));
@@ -85,64 +87,70 @@ const PageLoader = () => (
 );
 
 const App = () => {
-  const location = useLocation
-  const isAdmin = location('/admin')
+  const location = useLocation()
+  const isAdmin = location.pathname.startsWith("/admin");
   return (
     <AuthProvider>
-      <BookingProvider>
-        <div className="overflow-x-hidden">
-          {!isAdmin && <Navbar />}
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <Suspense fallback={<PageLoader />}>
-                  <Home />
-                </Suspense>
-              }
-            />
+      <SiteSettingsProvider>
+        <BookingProvider>
+          <div className="overflow-x-hidden">
+            {!isAdmin && <Navbar />}
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Home />
+                  </Suspense>
+                }
+              />
 
-            <Route path="/about" element={<About />} />
-            <Route path="/about-company" element={<Company />} />
-            <Route path="/our-works" element={<Portfolio />} />
-            <Route path="/contact-us" element={<Contact />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/bookings" element={<BookingPage />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/about-company" element={<Company />} />
+              <Route path="/our-works" element={<Portfolio />} />
+              <Route path="/contact-us" element={<Contact />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/success" element={<SuccessPage />} />
+              <Route path="/bookings" element={<BookingPage />} />
+              <Route
+                path="/class-registration"
+                element={<ClassRegistration />}
+              />
 
-            <Route
-              path="/book-us"
-              element={
-                <Suspense fallback={<PageLoader />}>
-                  <Booking />
-                </Suspense>
-              }
-            />
+              <Route
+                path="/book-us"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Booking />
+                  </Suspense>
+                }
+              />
 
-            <Route
-              path="/courses"
-              element={
-                <Suspense fallback={<PageLoader />}>
-                  <Education />
-                </Suspense>
-              }
-            />
+              <Route
+                path="/courses"
+                element={
+                  <Suspense fallback={<PageLoader />}>
+                    <Education />
+                  </Suspense>
+                }
+              />
 
-            {/* Auth */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+              {/* Auth */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            {/* User dashboard */}
-            {/* <Route path="/dashboard" element={<UserDashboard />} /> */}
+              {/* User dashboard */}
+              <Route path="/dashboard" element={<UserDashboard />} />
 
-            {/* Admin */}
-            <Route path="/admin/setup" element={<AdminSetup />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={<Dashboard />} />
-          </Routes>
-          <Footer />
-        </div>
-      </BookingProvider>
+              {/* Admin */}
+              <Route path="/admin/setup" element={<AdminSetup />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<Dashboard />} />
+            </Routes>
+            <Footer />
+          </div>
+        </BookingProvider>
+      </SiteSettingsProvider>
     </AuthProvider>
   );
 };

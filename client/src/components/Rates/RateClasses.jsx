@@ -1,61 +1,121 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-export default function RateClases() {
-  const sections = [
-    {
-      title: "Personal Glam",
-      badge: "Beginner",
-      groups: [
-        {
-          subtitle: "In-Person One-One",
-          items: [
-            "1 day — GHS 1,500",
-            "2 days — GHS 2,450",
-            "3 days — GHS 3,250",
-          ],
-        },
-        {
-          subtitle: "Online One-One",
-          items: ["1 day — GHS 1,000", "2 days — GHS 1,800"],
-        },
-      ],
-    },
-    {
-      title: "Intermediate Course",
-      badge: "Intermediate",
-      groups: [
-        {
-          subtitle: "In-Person One-One",
-          items: ["5 days — GHS 4,500"],
-        },
-      ],
-    },
-    {
-      title: "Professional Course",
-      badge: "Professional",
-      groups: [
-        {
-          subtitle: "Internship Course",
-          items: ["4 weeks — GHS 7,500"],
-        },
-        {
-          subtitle: "Group Course (5–10 students)",
-          items: ["2 days — GHS 7,000 – 10,000"],
-        },
-      ],
-    },
-  ];
+const API = import.meta.env.VITE_API_URL;
 
-  const badgeColors = {
-    Beginner: "bg-[#fdf6e3] text-[#7c5546] border-[#d4b86a]/40",
-    Intermediate: "bg-[#f5f0ff] text-[#6b46c1] border-[#6b46c1]/20",
-    Professional: "bg-[#1a1a1a] text-[#d4b86a] border-transparent",
-  };
+const DEFAULT_SECTIONS = [
+  {
+    title: "Personal Glam",
+    groups: [
+      {
+        subtitle: "In-Person One-One",
+        items: [
+          "1 day — GHS 1,500",
+          "2 days — GHS 2,450",
+          "3 days — GHS 3,250",
+        ],
+      },
+      {
+        subtitle: "Online One-One",
+        items: ["1 day — GHS 1,000", "2 days — GHS 1,800"],
+      },
+    ],
+  },
+  {
+    title: "Intermediate Course",
+    groups: [{ subtitle: "In-Person One-One", items: ["5 days — GHS 4,500"] }],
+  },
+  {
+    title: "Professional Course",
+    groups: [
+      { subtitle: "Internship Course", items: ["4 weeks — GHS 7,500"] },
+      {
+        subtitle: "Group Course (5–10 students)",
+        items: ["2 days — GHS 7,000 – 10,000"],
+      },
+    ],
+  },
+];
+
+export default function RateClases() {
+  const [sections, setSections] = useState(DEFAULT_SECTIONS);
+
+  useEffect(() => {
+    fetch(`${API}/api/settings/rates`)
+      .then((r) => r.json())
+      .then((data) => {
+        const courses = data?.courses;
+        if (!courses?.length) return;
+        // Rebuild items from API data
+        setSections([
+          {
+            title: "Personal Glam",
+            groups: [
+              {
+                subtitle: "In-Person One-One",
+                items: courses
+                  .filter((c) => c.name.toLowerCase().includes("in-person"))
+                  .map(
+                    (c) =>
+                      `${c.name.split("—")[1]?.trim() || c.name} — ${c.price}`,
+                  ),
+              },
+              {
+                subtitle: "Online One-One",
+                items: courses
+                  .filter((c) => c.name.toLowerCase().includes("online"))
+                  .map(
+                    (c) =>
+                      `${c.name.split("—")[1]?.trim() || c.name} — ${c.price}`,
+                  ),
+              },
+            ],
+          },
+          {
+            title: "Intermediate Course",
+            groups: [
+              {
+                subtitle: "In-Person One-One",
+                items: courses
+                  .filter((c) => c.name.toLowerCase().includes("intermediate"))
+                  .map(
+                    (c) =>
+                      `${c.name.split("—")[1]?.trim() || c.name} — ${c.price}`,
+                  ),
+              },
+            ],
+          },
+          {
+            title: "Professional Course",
+            groups: [
+              {
+                subtitle: "Internship Course",
+                items: courses
+                  .filter((c) => c.name.toLowerCase().includes("internship"))
+                  .map(
+                    (c) =>
+                      `${c.name.split("—")[1]?.trim() || c.name} — ${c.price}`,
+                  ),
+              },
+              {
+                subtitle: "Group Course (5–10 students)",
+                items: courses
+                  .filter((c) => c.name.toLowerCase().includes("group"))
+                  .map(
+                    (c) =>
+                      `${c.name.split("—")[1]?.trim() || c.name} — ${c.price}`,
+                  ),
+              },
+            ],
+          },
+        ]);
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <section className="w-full py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* HEADER */}
         <div className="text-center mb-12">
           <p className="text-xs tracking-[4px] uppercase text-[#d4b86a] font-medium mb-3">
             Training Programs
@@ -64,9 +124,9 @@ export default function RateClases() {
             Beauty <span className="text-[#7c5546]">Courses</span>
           </h1>
           <div className="flex items-center justify-center gap-2 mt-3 mb-4">
-            <div className="h-px w-10 bg-[#d4b86a]"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-[#d4b86a]"></div>
-            <div className="h-px w-10 bg-[#d4b86a]"></div>
+            <div className="h-px w-10 bg-[#d4b86a]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#d4b86a]" />
+            <div className="h-px w-10 bg-[#d4b86a]" />
           </div>
           <p className="text-gray-500 max-w-2xl mx-auto text-sm leading-relaxed">
             Learn professional makeup artistry through our structured courses
@@ -74,7 +134,6 @@ export default function RateClases() {
           </p>
         </div>
 
-        {/* CARDS */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sections.map((section, index) => (
             <motion.div
@@ -83,34 +142,22 @@ export default function RateClases() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.12 }}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+              className="bg-white rounded-2xl shadow-sm hover:shadow-lg
+                transition-all duration-300 overflow-hidden"
             >
-              {/* Card top accent */}
-              {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
-
               <div className="p-6 space-y-5">
-                {/* Title + badge */}
-                <div className="flex items-start justify-between gap-3">
-                  <h2 className="text-lg font-semibold text-[#1a1a1a]">
-                    {section.title}
-                  </h2>
-                  {/* <span
-                    className={`text-[10px] font-medium px-2.5 py-1 rounded-full border flex-shrink-0 ${badgeColors[section.badge]}`}
-                  >
-                    {section.badge}
-                  </span> */}
-                </div>
-
-                {/* Groups */}
+                <h2 className="text-lg font-semibold text-[#1a1a1a]">
+                  {section.title}
+                </h2>
                 <div className="space-y-4">
                   {section.groups.map((group, gi) => (
                     <div key={gi}>
-                      {/* Subtitle */}
-                      <p className="text-xs font-semibold text-[#7c5546] uppercase tracking-wider mb-2">
+                      <p
+                        className="text-xs font-semibold text-[#7c5546] uppercase
+                        tracking-wider mb-2"
+                      >
                         {group.subtitle}
                       </p>
-
-                      {/* Items */}
                       <ul className="space-y-1.5">
                         {group.items.map((item, ii) => (
                           <li
@@ -124,8 +171,6 @@ export default function RateClases() {
                           </li>
                         ))}
                       </ul>
-
-                      {/* Divider between groups */}
                       {gi < section.groups.length - 1 && (
                         <div className="mt-4 border-t border-[#f0e6dd]" />
                       )}

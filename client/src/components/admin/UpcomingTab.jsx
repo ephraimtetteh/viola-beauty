@@ -111,27 +111,30 @@ const UpcomingTab = ({ analytics, upcoming, token, onRefresh }) => {
       )}
 
       {/* All upcoming with reminder buttons */}
-      {upcoming.length > 0 ? (
+      {/* All upcoming with reminder buttons */}
+      {upcoming.filter((b) => b && b.daysUntil !== undefined).length > 0 ? (
         <div>
           <p
-            className="text-xs font-semibold text-[#d4b86a] uppercase
-            tracking-wider mb-2"
+            className="text-xs font-semibold text-gray-400 uppercase
+      tracking-wider mb-2 mt-4"
           >
             All Upcoming
           </p>
           <div className="space-y-2">
-            {upcoming.map((b) => (
-              <UpcomingCard
-                key={b._id}
-                booking={b}
-                onSendReminder={sendReminder}
-                sending={sending}
-              />
-            ))}
+            {upcoming
+              .filter((b) => b && b.daysUntil !== undefined)
+              .map((b) => (
+                <UpcomingCard
+                  key={b._id}
+                  booking={b}
+                  onSendReminder={sendReminder}
+                  sending={sending}
+                />
+              ))}
           </div>
         </div>
       ) : (
-        <p className="text-xs text-gray-400 text-center py-8">
+        <p className="text-xs text-gray-400 text-center py-6">
           No upcoming confirmed bookings
         </p>
       )}

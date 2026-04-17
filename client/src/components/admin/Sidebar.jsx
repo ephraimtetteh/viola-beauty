@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import StatsTab from "./StatsTab";
-import UpcomingTab from "./UpcomingTab";
-import ActivityTab from "./ActivityTab";
+import UpcomingTab from "./sidebar/UpcomingCard";
+import ActivityTab from "./sidebar/ActivityTab";
 
 const API = import.meta.env.VITE_API_URL;
 
 const TABS = [
-  { id: "stats", label: "📊 Stats" },
-  { id: "upcoming", label: "📅 Upcoming" },
-  { id: "activity", label: "🔔 Activity" },
+  { id: "stats", label: "Stats" },
+  { id: "upcoming", label: "Upcoming" },
+  { id: "activity", label: "Activity" },
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -116,10 +116,10 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
-              <div
+              {/* <div
                 className="w-6 h-6 border-2 border-[#d4b86a]/30
                 border-t-[#d4b86a] rounded-full animate-spin"
-              />
+              /> */}
               <p className="text-xs text-gray-400">Loading analytics...</p>
             </div>
           ) : (

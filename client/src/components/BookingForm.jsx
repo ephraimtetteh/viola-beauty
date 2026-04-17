@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AuthPrompt from "./auth/AuthPrompt";
 
@@ -60,6 +60,7 @@ const labelClass =
 
 export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
   const [step, setStep] = useState(defaultCategory ? 2 : 1);
+  const [blockedDates, setBlockedDates] = useState([]);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -138,6 +139,15 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetch(`${API}/api/blocked-dates`)
+      .then((r) => r.json())
+      .then(setBlockedDates)
+      .catch(console.error);
+  }, []);
+
+
 
   // ── Step 1 — Category ──
   if (step === 1) {
@@ -239,7 +249,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
     <div className="space-y-5">
       {/* Package selector */}
       <div className="bg-white border border-[#e8d9cc] rounded-2xl overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" />
+        {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
         <div className="p-5">
           <label className={labelClass}>Select Package *</label>
           <div className="grid gap-2 mt-2">
@@ -263,7 +273,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
 
       {/* Personal details */}
       <div className="bg-white border border-[#e8d9cc] rounded-2xl overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" />
+        {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
         <div className="p-5 space-y-4">
           <h3 className="font-semibold text-[#1a1a1a]">Personal Details</h3>
           <div className="flex gap-3">
@@ -313,7 +323,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
 
       {/* Event details */}
       <div className="bg-white border border-[#e8d9cc] rounded-2xl overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" />
+        {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
         <div className="p-5 space-y-4">
           <h3 className="font-semibold text-[#1a1a1a]">Event Details</h3>
           <div>
@@ -321,10 +331,32 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
             <input
               type="date"
               value={form.date}
-              onChange={(e) => update("date", e.target.value)}
+              onChange={(e) => {
+                const selected = e.target.value;
+                if (blockedDates.includes(selected)) {
+                  update("date", "");
+                  setError(
+                    "This date is unavailable. Please choose another date.",
+                  );
+                } else {
+                  update("date", selected);
+                }
+              }}
               min={new Date().toISOString().split("T")[0]}
-              className={inputClass}
+              className={`${inputClass} ${
+                blockedDates.includes(form.date) ? "border-red-300" : ""
+              }`}
             />
+            {blockedDates.includes(form.date) && (
+              <p className="text-red-500 text-xs mt-1 pl-3">
+                This date is unavailable. Please choose another date.
+              </p>
+            )}
+            {blockedDates.length > 0 && (
+              <p className="text-xs text-gray-400 mt-1 pl-3">
+                Some dates may be unavailable due to existing bookings.
+              </p>
+            )}
           </div>
           <div>
             <label className={labelClass}>Location / Venue</label>

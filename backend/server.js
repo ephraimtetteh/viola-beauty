@@ -9,10 +9,13 @@ import bookingRoutes from "./routes/bookings.js";
 import rateRoutes from "./routes/rates.js";
 import activityRoutes from "./routes/activity.js";
 import userRoutes from "./routes/users.js";
-import reminderRoutes from "./routes/reminders.js"; // ✅ new
-import analyticsRoutes from "./routes/analytics.js"; // ✅ new
+import reminderRoutes from "./routes/reminders.js"; 
+import analyticsRoutes from "./routes/analytics.js"; 
+import blockedDateRoutes from "./routes/blockedDates.js";
+import settingsRoutes from "./routes/settings.js";
+import classRoutes from "./routes/classes.js";
 
-import { startReminderCron } from "./services/reminders.js"; // ✅ new
+import { startReminderCron } from "./services/reminders.js"; 
 
 dotenv.config();
 const app = express();
@@ -42,8 +45,12 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/rates", rateRoutes);
 app.use("/api/activity", activityRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/reminders", reminderRoutes); // ✅
-app.use("/api/analytics", analyticsRoutes); // ✅
+app.use("/api/reminders", reminderRoutes); 
+app.use("/api/analytics", analyticsRoutes); 
+app.use("/api/blocked-dates", blockedDateRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api/classes", classRoutes);
+
 
 app.get("/", (req, res) => res.json({ status: "Viola API ✅" }));
 

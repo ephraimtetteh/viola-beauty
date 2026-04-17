@@ -1,17 +1,16 @@
 import { useState } from "react";
 
-const AuthInput = ({
+const InputField = ({
   label,
   type = "text",
-  placeholder,
   value,
   onChange,
-  error,
-  disabled = false,
+  placeholder,
+  disabled,
 }) => {
   const [show, setShow] = useState(false);
   const isPassword = type === "password";
-  const resolvedType = isPassword && show ? "text" : type;
+  const inputType = isPassword && show ? "text" : type;
 
   return (
     <div>
@@ -25,35 +24,28 @@ const AuthInput = ({
       )}
       <div className="relative">
         <input
-          type={resolvedType}
-          placeholder={placeholder}
+          type={inputType}
           value={value}
           onChange={onChange}
+          placeholder={placeholder}
           disabled={disabled}
-          className={`w-full border rounded-full px-5 py-3 text-sm
-            focus:outline-none transition disabled:bg-gray-50
-            disabled:cursor-not-allowed
-            ${isPassword ? "pr-16" : "pr-5"}
-            ${
-              error
-                ? "border-red-300 focus:border-red-400"
-                : "border-[#e8d9cc] focus:border-[#d4b86a]"
-            }`}
+          className="w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm
+            focus:outline-none focus:border-[#d4b86a] bg-white pr-12
+            disabled:bg-gray-50 disabled:cursor-not-allowed transition"
         />
         {isPassword && (
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
             className="absolute right-4 top-1/2 -translate-y-1/2
-              text-xs text-gray-400 hover:text-gray-600 transition select-none"
+              text-gray-400 hover:text-gray-600 text-xs transition select-none"
           >
             {show ? "Hide" : "Show"}
           </button>
         )}
       </div>
-      {error && <p className="text-red-500 text-xs mt-1 pl-3">{error}</p>}
     </div>
   );
 };
 
-export default AuthInput;
+export default InputField;

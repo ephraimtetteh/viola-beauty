@@ -1,6 +1,6 @@
-import StatPill from "./StatPill";
+import StatPill from "./sidebar/StatPill";
 import MiniBar from "./MiniBar";
-import SidebarCard from "./SidebarCard";
+import SidebarCard from "./sidebar/SidebarCard";
 
 const MONTH_NAMES = [
   "Jan",

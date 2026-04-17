@@ -6,6 +6,7 @@ import {
   sendBookingEmails,
   sendStatusEmail,
 } from "../email/bookingTemplates.js";
+import BlockedDate from "../models/BlockedDate.js";
 
 const router = express.Router();
 
@@ -14,21 +15,33 @@ router.post("/", async (req, res) => {
   try {
     const booking = await Booking.create(req.body);
 
+    // ✅ Auto-block the booked date
+    await BlockedDate.findOneAndUpdate(
+      { date: booking.date },
+      {
+        date: booking.date,
+        reason: `Booked — ${booking.firstName} ${booking.lastName} (${booking.category})`,
+        autoBlocked: true,
+      },
+      { upsert: true },
+    ).catch(console.error);
+
     await Activity.create({
       type: "booking",
       message: `New ${booking.category} booking from ${booking.firstName} ${booking.lastName}`,
       meta: { bookingId: booking._id },
     });
 
-    // Fire and forget — don't block response
     sendBookingEmails(booking).catch(console.error);
-
     res.status(201).json({ success: true, booking });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to create booking" });
   }
 });
+
+
+
 
 // ── Admin — get all with filters ──
 router.get("/", protect, async (req, res) => {
@@ -49,6 +62,9 @@ router.get("/", protect, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch bookings" });
   }
 });
+
+
+
 
 // ── Admin — update status + send email ──
 router.patch("/:id/status", protect, async (req, res) => {
@@ -73,6 +89,10 @@ router.patch("/:id/status", protect, async (req, res) => {
     res.status(500).json({ error: "Failed to update status" });
   }
 });
+
+
+
+
 
 // ── Admin — export CSV ──
 router.get("/export", protect, async (req, res) => {
@@ -133,10 +153,31 @@ router.get("/export", protect, async (req, res) => {
   }
 });
 
+
+
+
+
+
 // ── Admin — delete ──
 router.delete("/:id", protect, async (req, res) => {
   try {
-    await Booking.findByIdAndDelete(req.params.id);
+    const booking = await Booking.findByIdAndDelete(req.params.id);
+
+    // ✅ Unblock date if no other confirmed bookings on that day
+    if (booking) {
+      const otherBookings = await Booking.countDocuments({
+        date: booking.date,
+        _id: { $ne: booking._id },
+        status: { $ne: "declined" },
+      });
+      if (!otherBookings) {
+        await BlockedDate.findOneAndDelete({
+          date: booking.date,
+          autoBlocked: true,
+        });
+      }
+    }
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete" });

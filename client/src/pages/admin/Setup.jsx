@@ -8,6 +8,8 @@ export default function AdminSetup() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
   const handleSetup = async () => {
@@ -52,7 +54,7 @@ export default function AdminSetup() {
         </div>
 
         <div className="bg-white border border-[#e8d9cc] rounded-2xl overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" />
+          {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
           <div className="p-8 space-y-4">
             {success ? (
               <div className="text-center py-4 space-y-2">
@@ -70,25 +72,48 @@ export default function AdminSetup() {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#d4b86a]"
                 />
-                <input
-                  type="password"
-                  placeholder="Password (min 8 characters)"
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
-                  className="w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#d4b86a]"
-                />
-                <input
-                  type="password"
-                  placeholder="Confirm password"
-                  value={form.confirm}
-                  onChange={(e) =>
-                    setForm({ ...form, confirm: e.target.value })
-                  }
-                  onKeyDown={(e) => e.key === "Enter" && handleSetup()}
-                  className="w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#d4b86a]"
-                />
+                <div className="relative">
+                  <input
+                    type={showPass ? "text" : "password"}
+                    placeholder="Password (min 8 characters)"
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                    className="w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm
+      focus:outline-none focus:border-[#d4b86a] pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass((s) => !s)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2
+      text-gray-400 hover:text-gray-600 text-xs transition"
+                  >
+                    {showPass ? "Hide" : "Show"}
+                  </button>
+                </div>
+                
+
+                <div className="relative">
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    placeholder="Confirm password"
+                    value={form.confirm}
+                    onChange={(e) =>
+                      setForm({ ...form, confirm: e.target.value })
+                    }
+                    className="w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm
+      focus:outline-none focus:border-[#d4b86a] pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm((s) => !s)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2
+      text-gray-400 hover:text-gray-600 text-xs transition"
+                  >
+                    {showConfirm ? "Hide" : "Show"}
+                  </button>
+                </div>
                 {error && <p className="text-red-500 text-xs">{error}</p>}
                 <button
                   onClick={handleSetup}

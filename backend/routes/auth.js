@@ -75,20 +75,34 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+
+// ── First-time admin setup ──
+// ── Allowed admin emails ──
+const ALLOWED_ADMIN_EMAILS = [
+  "hello@violabeautymua.com",
+  "tettehephraim.64@gmail.com",
+];
+
 // ── First-time admin setup ──
 router.post("/setup", async (req, res) => {
   try {
-    const existing = await Admin.findOne();
-    if (existing)
-      return res.status(403).json({ error: "Admin already exists" });
-
     const { email, password } = req.body;
+
     if (!email || !password)
       return res.status(400).json({ error: "Email and password required" });
 
-    const hash = await bcrypt.hash(password, 10);
+    // ✅ Only allow whitelisted emails
+    if (!ALLOWED_ADMIN_EMAILS.includes(email.toLowerCase()))
+      return res.status(403).json({ error: "This email is not authorised for admin access" });
+
+    const existing = await Admin.findOne({ email: email.toLowerCase() });
+    if (existing)
+      return res.status(403).json({ error: "Admin account already exists for this email" });
+
+    const hash  = await bcrypt.hash(password, 10);
     const admin = await Admin.create({
-      email: email.toLowerCase(),
+      email:        email.toLowerCase(),
       passwordHash: hash,
     });
 
@@ -97,6 +111,9 @@ router.post("/setup", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
 
 // ── Change admin password ──
 router.post("/change-password", async (req, res) => {

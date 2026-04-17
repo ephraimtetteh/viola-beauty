@@ -54,18 +54,18 @@ router.get("/upcoming", protect, async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const bookings = await Booking.find({
-      status: "confirmed",
-    }).sort({ date: 1 });
+    const bookings = await Booking.find({ status: "confirmed" }).sort({
+      date: 1,
+    });
 
-    // Filter to future bookings and add days until
     const upcoming = bookings
       .map((b) => {
         const eventDate = new Date(b.date);
+        eventDate.setHours(0, 0, 0, 0);
         const daysUntil = Math.round(
           (eventDate - today) / (1000 * 60 * 60 * 24),
         );
-        return { ...b.toObject(), daysUntil };
+        return { ...b.toObject(), daysUntil }; // ✅ daysUntil added here
       })
       .filter((b) => b.daysUntil >= 0)
       .slice(0, 20);
@@ -75,5 +75,4 @@ router.get("/upcoming", protect, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 export default router;
