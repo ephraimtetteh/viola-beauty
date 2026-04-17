@@ -12,11 +12,11 @@ import SuccessPage from "./pages/success";
 import { BookingProvider } from "./context/BookingContext";
 import BookingPage from "./pages/booking";
 import ClassRegistration from "./pages/classRegistration";
-import UserDashboard from './pages/UserDashboard'
+// import UserDashboard from './pages/UserDashboard'
 
 import AdminSetup from "./pages/admin/Setup";
 import AdminLogin from "./pages/admin/Login";
-// import Dashboard from "./pages/admin/Dashboard";
+import Dashboard from "./pages/admin/Dashboard";
 
 import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/auth/Login";
