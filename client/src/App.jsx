@@ -12,15 +12,15 @@ import SuccessPage from "./pages/success";
 import { BookingProvider } from "./context/BookingContext";
 import BookingPage from "./pages/booking";
 import ClassRegistration from "./pages/classRegistration";
+import UserDashboard from './pages/UserDashboard'
 
 import AdminSetup from "./pages/admin/Setup";
 import AdminLogin from "./pages/admin/Login";
-import Dashboard from "./pages/admin/Dashboard";
+// import Dashboard from "./pages/admin/Dashboard";
 
 import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import UserDashboard from "./pages/UserDashboard";
 import { SiteSettingsProvider } from "./context/SiteSettingsContext";
 
 
@@ -140,7 +140,7 @@ const App = () => {
               <Route path="/register" element={<Register />} />
 
               {/* User dashboard */}
-              <Route path="/dashboard" element={<UserDashboard />} />
+              {/* <Route path="/dashboard" element={<UserDashboard />} /> */}
 
               {/* Admin */}
               <Route path="/admin/setup" element={<AdminSetup />} />
