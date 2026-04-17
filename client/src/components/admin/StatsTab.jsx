@@ -1,5 +1,5 @@
 import StatPill from "./sidebar/StatPill";
-import MiniBar from "./MiniBar";
+import MiniBar from "./Minibar";
 import SidebarCard from "./sidebar/SidebarCard";
 
 const MONTH_NAMES = [
