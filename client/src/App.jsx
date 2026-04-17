@@ -11,7 +11,7 @@ import CheckoutPage from "./pages/checkout";
 import SuccessPage from "./pages/success";
 import { BookingProvider } from "./context/BookingContext";
 import BookingPage from "./pages/booking";
-import ClassRegistration from "./pages/ClassRegistration";
+import ClassRegistration from "./pages/classRegistration";
 
 import AdminSetup from "./pages/admin/Setup";
 import AdminLogin from "./pages/admin/Login";
