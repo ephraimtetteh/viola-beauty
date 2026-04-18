@@ -108,12 +108,12 @@ export default function EssentialsServices() {
                 <span className="text-xl font-semibold text-black">
                   {service.price}
                 </span>
-                <button
+                <a href="/bookings"
                   className="px-4 py-2 rounded-full bg-transparent text-black
                   border border-black hover:bg-black hover:text-white text-sm transition"
                 >
                   Book
-                </button>
+                </a>
               </div>
             </motion.div>
           ))}

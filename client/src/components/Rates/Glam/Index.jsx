@@ -110,12 +110,12 @@ export default function GlamServices() {
                 <span className="text-xl font-semibold text-[#7c5546]">
                   {service.price}
                 </span>
-                <button
+                <a href="/bookings"
                   className="px-4 py-2 rounded-full bg-[#7c5546] text-white
                   text-sm hover:bg-[#6b4a3d] transition"
                 >
                   Book
-                </button>
+                </a>
               </div>
             </motion.div>
           ))}
