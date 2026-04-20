@@ -18,7 +18,7 @@ const Text = ({text, className}) => {
       <h3 className="text-center">
         {text}
       </h3>
-      <div className="w-24 h-0.75 rounded-full bg-linear-to-r from-[#7c5546] to-[#FFf8f5]"></div>
+      {/* <div className="w-24 h-0.75 rounded-full bg-linear-to-r from-[#7c5546] to-[#FFf8f5]"></div> */}
     </div>
   );
 }

@@ -33,7 +33,7 @@ const Courses = () => {
       <div className="max-w-6xl mx-auto text-center">
         {/* HEADER */}
         <button className="bg-neutral-800 text-sm text-white/80 px-6 py-2.5 rounded-full">
-          The Glam Artistry Series
+          The Signature Glam Series
         </button>
 
         {/* <h2 className="text-black font-medium text-3xl md:text-4xl mt-6 max-w-2xl mx-auto">
@@ -72,7 +72,7 @@ const Courses = () => {
         <Link to={'/courses'}
          
          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-         className="inline-block bg-neutral-800 hover:bg-neutral-700 transition text-sm text-white/90 px-8 py-3 rounded-full mt-12"
+         className="inline-block bg-transparent border border-black hover:bg-neutral-700 transition text-sm text-black px-8 py-3 rounded-full mt-12"
        >
          Explore
        </Link>

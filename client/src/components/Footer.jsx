@@ -96,9 +96,9 @@ const Footer = () => {
                   <a href="/courses" className="hover:text-white">
                     Courses
                   </a>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-950 border border-green-300 text-green-300">
+                  {/* <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-950 border border-green-300 text-green-300">
                     Buy now
-                  </span>
+                  </span> */}
                 </li>
                 <li>
                   <a href="/privacy" className="hover:text-white">

@@ -21,10 +21,6 @@ const Home = () => {
       <Courses />
       <AboutComponent />
       <CTA />
-      {/* <Image
-        image={images.bgImage}
-        title={"You're so talented Vincentia ❤️❤️❤️"}
-        /> */}
         <Testimonials />
       <CTAgallary />
     </>
