@@ -15,13 +15,8 @@ const slides = [
   },
   {
     title: "Discover Amazing Deals",
-    image: images.company,
+    image: images.company2,
     link: "/shop",
-  },
-  {
-    title: "Grow Your Business with SmileBaba",
-    image: images.company,
-    link: "/register",
   },
 ];
 

@@ -34,18 +34,23 @@ const Footer = () => {
               <h3 className="font-medium text-sm mb-4 md:mb-6">Products</h3>
               <ul className="space-y-3 md:space-y-4 text-sm text-white/70">
                 <li>
-                  <a href="/about" className="hover:text-white">
-                    About
+                  <a href="/" className="hover:text-white">
+                    Online courses
                   </a>
                 </li>
                 <li>
-                  <a href="/our-works" className="hover:text-white">
-                    Portfolio
+                  <a href="/book-us" className="hover:text-white">
+                    Bridal
                   </a>
                 </li>
                 <li>
-                  <a href="/home" className="hover:text-white">
-                    Home
+                  <a href="/book-us" className="hover:text-white">
+                    Glam Sessions
+                  </a>
+                </li>
+                <li>
+                  <a href="/book-us" className="hover:text-white">
+                    In-person Classes
                   </a>
                 </li>
               </ul>
@@ -88,17 +93,22 @@ const Footer = () => {
               <h3 className="font-medium text-sm mb-4 md:mb-6">Company</h3>
               <ul className="space-y-3 md:space-y-4 text-sm text-white/70">
                 <li>
-                  <a href="about" className="hover:text-white">
-                    About
+                  <a href="/" className="hover:text-white">
+                    Home
                   </a>
                 </li>
                 <li className="flex items-center gap-2">
-                  <a href="/courses" className="hover:text-white">
-                    Courses
+                  <a href="/about" className="hover:text-white">
+                    About
                   </a>
                   {/* <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-950 border border-green-300 text-green-300">
                     Buy now
                   </span> */}
+                </li>
+                <li>
+                  <a href="/our-works" className="hover:text-white">
+                    Porfolio
+                  </a>
                 </li>
                 <li>
                   <a href="/privacy" className="hover:text-white">

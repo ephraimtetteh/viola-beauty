@@ -43,6 +43,7 @@ import about7 from "../assets/images/me/about7.jpg";
 import about12 from "../assets/images/me/me12.JPG";
 import vincentia from "../assets/images/me/landingAbout.jpg";
 import company from "../assets/images/me/company2.JPEG";
+import company2 from "../assets/images/me/company3.jpeg";
 
 import bgImage from "../assets/images/bgImage.jpg";
 import bgImage2 from "../assets/images/bg4.JPG";
@@ -65,6 +66,7 @@ export const images = {
   about8,
   about12,
   company,
+  company2,
   educationbg1,
   educationbg2,
   educationbg3,
