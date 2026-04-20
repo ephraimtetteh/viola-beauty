@@ -19,14 +19,14 @@ export const sendCourseEmail = async ({
     from: `"Viola Beauty" <${process.env.NODEMAILER_USER}>`,
     to: email,
     replyTo: process.env.NODEMAILER_USER,
-    subject: `Welcome to ${courseName}, ${firstName}! ✨`,
+    subject: `Welcome to ${courseName}, ${firstName}! `,
     html: wrap(
-      `You're In, ${firstName}! 🎉`,
+      `You're In, ${firstName}!`,
       `<p style="color:#555;font-size:14px;line-height:1.8;margin:0 0 16px;">
         Thank you so much for purchasing
         <strong style="color:#7c5546;">${courseName}</strong>.
         We are so proud of you for investing in yourself — this is just
-        the beginning of something beautiful. ✨
+        the beginning of something beautiful. 
       </p>
       ${infoTable([
         ["Course", courseName],
@@ -78,9 +78,9 @@ export const sendWelcomeEmail = async (user) => {
   await transporter.sendMail({
     from: `"Viola Beauty" <${process.env.NODEMAILER_USER}>`,
     to: user.email,
-    subject: `Welcome to Viola Beauty, ${user.firstName}! ✨`,
+    subject: `Welcome to Viola Beauty, ${user.firstName}! `,
     html: wrap(
-      `Welcome, ${user.firstName}! 💄`,
+      `Welcome, ${user.firstName}!`,
       `<p style="color:#555;font-size:14px;line-height:1.8;margin:0 0 16px;">
         We are so excited to have you join the Viola Beauty family!
         Your account has been created and you can now track your

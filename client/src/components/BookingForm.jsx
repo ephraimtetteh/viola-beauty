@@ -167,7 +167,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-2xl">{data.icon}</span>
+                {/* <span className="text-2xl">{data.icon}</span> */}
                 <div>
                   <h3 className="font-semibold text-[#1a1a1a]">{cat}</h3>
                   <p className="text-xs text-gray-400 mt-0.5">
@@ -397,7 +397,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
       </div>
 
       {/* Summary */}
-      <div className="bg-[#fdf6e3] border border-[#d4b86a]/30 rounded-2xl p-4">
+      <div className=" border border-[#d4b86a]/30 rounded-2xl p-4">
         <p className="text-xs font-semibold text-[#d4b86a] uppercase tracking-wider mb-3">
           Booking Summary
         </p>

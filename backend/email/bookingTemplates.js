@@ -24,9 +24,9 @@ export const sendBookingEmails = async (booking) => {
     from: `"Viola Beauty" <${process.env.NODEMAILER_USER}>`,
     to: booking.email,
     replyTo: process.env.NODEMAILER_USER,
-    subject: `Your Viola Beauty Booking is Received, ${booking.firstName}! ✨`,
+    subject: `Your Viola Beauty Booking is Received, ${booking.firstName}!`,
     html: wrap(
-      `We've Got Your Booking, ${booking.firstName}! 🎉`,
+      `We've Got Your Booking, ${booking.firstName}!`,
       `<p style="color:#555;font-size:14px;line-height:1.8;margin:0 0 16px;">
         Thank you for choosing Viola Beauty! Your
         <strong style="color:#7c5546;">${booking.category}</strong>
@@ -52,13 +52,13 @@ export const sendBookingEmails = async (booking) => {
     from: `"Viola Bookings" <${process.env.NODEMAILER_USER}>`,
     to: ADMIN_EMAILS.join(","),
     replyTo: booking.email,
-    subject: `🔔 New ${booking.category} — ${booking.firstName} ${booking.lastName} | ${booking.date}`,
+    subject: `New ${booking.category} — ${booking.firstName} ${booking.lastName} | ${booking.date}`,
     html: wrap(
-      "🔔 New Booking Request",
+      "New Booking Request",
       `<div style="background:#fdf6e3;border:1px solid #d4b86a;border-radius:12px;
                   padding:14px 18px;margin:0 0 20px;">
         <p style="color:#7c5546;font-size:13px;font-weight:700;margin:0;">
-          ⏰ Please respond within 24 hours
+          Please respond within 24 hours
         </p>
       </div>
       ${infoTable([
@@ -94,12 +94,12 @@ export const sendBookingEmails = async (booking) => {
 export const sendStatusEmail = async (booking, status) => {
   const content = {
     confirmed: {
-      title: `Your Booking is Confirmed, ${booking.firstName}! 🎉`,
+      title: `Your Booking is Confirmed, ${booking.firstName}!`,
       body: `
         <p style="color:#555;font-size:14px;line-height:1.8;margin:0 0 16px;">
           We are thrilled to confirm your
           <strong style="color:#7c5546;">${booking.package}</strong>
-          appointment on <strong>${booking.date}</strong>. 💄
+          appointment on <strong>${booking.date}</strong>.
         </p>
         ${bookingTable(booking)}
         <div style="background:#fdf6e3;border-left:3px solid #d4b86a;
@@ -156,9 +156,9 @@ export const sendReminderEmail = async (booking, days) => {
     from:    `"Viola Beauty" <${process.env.NODEMAILER_USER}>`,
     to:      booking.email,
     replyTo: process.env.NODEMAILER_USER,
-    subject: `Reminder: Your Viola Beauty Appointment is ${label}! 💄`,
+    subject: `Reminder: Your Viola Beauty Appointment is ${label}!`,
     html: wrap(
-      `Your Appointment is ${label}! 🗓️`,
+      `Your Appointment is ${label}!`,
       `<p style="color:#555;font-size:14px;line-height:1.8;margin:0 0 16px;">
         Hi <strong>${booking.firstName}</strong>, just a friendly reminder that
         your <strong style="color:#7c5546;">${booking.package}</strong>
@@ -185,13 +185,13 @@ export const sendReminderEmail = async (booking, days) => {
   await transporter.sendMail({
     from:    `"Viola Reminders" <${process.env.NODEMAILER_USER}>`,
     to:      ADMIN_EMAILS.join(","),
-    subject: `📅 ${days}-Day Reminder: ${booking.firstName} ${booking.lastName} | ${booking.date}`,
+    subject: `${days}-Day Reminder: ${booking.firstName} ${booking.lastName} | ${booking.date}`,
     html: wrap(
       `${days}-Day Appointment Reminder`,
       `<div style="background:#fdf6e3;border:1px solid #d4b86a;border-radius:12px;
                   padding:14px 18px;margin:0 0 20px;">
         <p style="color:#7c5546;font-size:13px;font-weight:700;margin:0;">
-          📅 This appointment is ${label}
+          This appointment is ${label}
         </p>
       </div>
       ${infoTable([

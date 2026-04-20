@@ -30,7 +30,7 @@ const BookingModal = ({ isOpen, onClose, defaultCategory = "" }) => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full max-w-lg bg-[#fff8f5] z-[101] shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 h-full w-full max-w-lg z-[101] shadow-2xl flex flex-col"
           >
             {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-[#e8d9cc] bg-white">
