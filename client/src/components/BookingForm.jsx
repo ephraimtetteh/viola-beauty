@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import AuthPrompt from "./auth/AuthPrompt";
+import { useTracking } from "../hooks/useTracking";
 
 const API = import.meta.env.VITE_API_URL;
 
 const SERVICE_PACKAGES = {
   Bridal: {
-    icon: "💍",
     description: "Wedding day glam, trials & consultation",
     packages: [
       "April Package — Bride Only",
@@ -18,14 +18,13 @@ const SERVICE_PACKAGES = {
       "Half Day Package",
       "Full Day Package",
       "Trial & Consultation",
-      "Civil Wedding — GHS 2,500",
-      "Sunday Thanksgiving — GHS 2,000",
-      "Mother of the Bride — GHS 1,000",
+      "Civil Wedding",
+      "Sunday Thanksgiving",
+      "Mother of the Bride",
       "Bridesmaid Glam (per head)",
     ],
   },
   "Glam Sessions": {
-    icon: "✨",
     description: "Everyday, soft & statement glam sessions",
     packages: [
       "Everyday Glam Session",
@@ -37,23 +36,24 @@ const SERVICE_PACKAGES = {
     ],
   },
   Classes: {
-    icon: "🎓",
     description: "In-person and online makeup courses",
     packages: [
-      "Personal Glam — In-Person 1 Day (GHS 1,500)",
-      "Personal Glam — In-Person 2 Days (GHS 2,450)",
-      "Personal Glam — In-Person 3 Days (GHS 3,250)",
-      "Personal Glam — Online 1 Day (GHS 1,000)",
-      "Personal Glam — Online 2 Days (GHS 1,800)",
-      "Intermediate — 5 Days (GHS 4,500)",
-      "Professional Internship — 4 Weeks (GHS 7,500)",
-      "Group Course 2 Days (GHS 7,000–10,000)",
+      "Personal Glam — In-Person 1 Day",
+      "Personal Glam — In-Person 2 Days",
+      "Personal Glam — In-Person 3 Days",
+      "Personal Glam — Online 1 Day",
+      "Personal Glam — Online 2 Days",
+      "Intermediate — 5 Days",
+      "Professional Internship — 4 Weeks",
+      "Group Course 2 Days",
     ],
   },
 };
 
 const inputClass =
-  "w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#d4b86a] bg-white text-gray-700 placeholder-gray-400 transition";
+  "w-full border border-[#e8d9cc] rounded-full px-5 py-3 text-sm " +
+  "focus:outline-none focus:border-[#d4b86a] bg-white text-gray-700 " +
+  "placeholder-gray-400 transition";
 
 const labelClass =
   "text-xs font-semibold text-[#7c5546] uppercase tracking-wider mb-1.5 block";
@@ -76,6 +76,15 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const { trackBooking } = useTracking();
+
+  useEffect(() => {
+    fetch(`${API}/api/blocked-dates`)
+      .then((r) => r.json())
+      .then(setBlockedDates)
+      .catch(console.error);
+  }, []);
+
   const update = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setError("");
@@ -84,6 +93,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
   const selectCategory = (cat) => {
     update("category", cat);
     update("package", "");
+    trackBooking("open", cat);
     setStep(2);
   };
 
@@ -105,9 +115,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
       return;
     }
     setLoading(true);
-
     try {
-      // ✅ POST to backend — Nodemailer handles both emails
       const res = await fetch(`${API}/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -130,6 +138,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
         throw new Error(data.error || "Booking failed");
       }
 
+      trackBooking("submit", form.category);
       setStep(3);
       onSuccess?.();
     } catch (err) {
@@ -139,15 +148,6 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetch(`${API}/api/blocked-dates`)
-      .then((r) => r.json())
-      .then(setBlockedDates)
-      .catch(console.error);
-  }, []);
-
-
 
   // ── Step 1 — Category ──
   if (step === 1) {
@@ -163,19 +163,19 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
             className="w-full bg-white border border-[#e8d9cc] hover:border-[#d4b86a]
-              hover:shadow-md rounded-2xl p-5 text-left transition-all duration-300 group"
+              hover:shadow-sm rounded-2xl p-5 text-left transition-all duration-300 group"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {/* <span className="text-2xl">{data.icon}</span> */}
-                <div>
-                  <h3 className="font-semibold text-[#1a1a1a]">{cat}</h3>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {data.description}
-                  </p>
-                </div>
+              <div>
+                <h3 className="font-semibold text-[#1a1a1a]">{cat}</h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {data.description}
+                </p>
               </div>
-              <span className="text-[#d4b86a] group-hover:translate-x-1 transition-transform">
+              <span
+                className="text-[#d4b86a] group-hover:translate-x-1
+                transition-transform"
+              >
                 →
               </span>
             </div>
@@ -193,7 +193,6 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="text-center space-y-5 py-4"
       >
-        <div className="text-5xl">🎉</div>
         <h2 className="text-2xl font-semibold text-[#1a1a1a]">
           Thank you, {form.firstName}!
         </h2>
@@ -203,8 +202,14 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
           hours.
         </p>
 
-        <div className="bg-[#fdf6e3] border border-[#d4b86a]/30 rounded-2xl p-5 text-left space-y-2">
-          <p className="text-xs font-semibold text-[#d4b86a] uppercase tracking-wider mb-3">
+        <div
+          className="bg-[#fdf6e3] border border-[#d4b86a]/30 rounded-2xl
+          p-5 text-left space-y-2"
+        >
+          <p
+            className="text-xs font-semibold text-[#d4b86a] uppercase
+            tracking-wider mb-3"
+          >
             Booking Summary
           </p>
           {[
@@ -244,161 +249,156 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
     );
   }
 
-  // ── Step 2 — Details form ──
+  // ── Step 2 — Details ──
   return (
     <div className="space-y-5">
       {/* Package selector */}
-      <div className="bg-white border border-[#e8d9cc] rounded-2xl overflow-hidden">
-        {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
-        <div className="p-5">
-          <label className={labelClass}>Select Package *</label>
-          <div className="grid gap-2 mt-2">
-            {SERVICE_PACKAGES[form.category]?.packages.map((pkg) => (
-              <button
-                key={pkg}
-                onClick={() => update("package", pkg)}
-                className={`text-left text-sm px-4 py-2.5 rounded-full border transition-all ${
+      <div className="bg-white border border-[#e8d9cc] rounded-2xl p-5">
+        <label className={labelClass}>Select Package *</label>
+        <div className="grid gap-2 mt-2">
+          {SERVICE_PACKAGES[form.category]?.packages.map((pkg) => (
+            <button
+              key={pkg}
+              onClick={() => update("package", pkg)}
+              className={`text-left text-sm px-4 py-2.5 rounded-full border
+                transition-all ${
                   form.package === pkg
                     ? "border-[#d4b86a] bg-[#fdf6e3] text-[#7c5546] font-medium"
                     : "border-[#e8d9cc] text-gray-600 hover:border-[#d4b86a]"
                 }`}
-              >
-                {form.package === pkg ? "✦ " : "○ "}
-                {pkg}
-              </button>
-            ))}
-          </div>
+            >
+              {form.package === pkg ? "✦ " : "○ "}
+              {pkg}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Personal details */}
-      <div className="bg-white border border-[#e8d9cc] rounded-2xl overflow-hidden">
-        {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
-        <div className="p-5 space-y-4">
-          <h3 className="font-semibold text-[#1a1a1a]">Personal Details</h3>
-          <div className="flex gap-3">
-            <div className="w-1/2">
-              <label className={labelClass}>First Name *</label>
-              <input
-                type="text"
-                placeholder="First name"
-                value={form.firstName}
-                onChange={(e) => update("firstName", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div className="w-1/2">
-              <label className={labelClass}>Last Name *</label>
-              <input
-                type="text"
-                placeholder="Last name"
-                value={form.lastName}
-                onChange={(e) => update("lastName", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          </div>
-          <div>
-            <label className={labelClass}>Email Address *</label>
+      <div className="bg-white border border-[#e8d9cc] rounded-2xl p-5 space-y-4">
+        <h3 className="font-semibold text-[#1a1a1a]">Personal Details</h3>
+        <div className="flex gap-3">
+          <div className="w-1/2">
+            <label className={labelClass}>First Name *</label>
             <input
-              type="email"
-              placeholder="your@email.com"
-              value={form.email}
-              onChange={(e) => update("email", e.target.value)}
+              type="text"
+              placeholder="First name"
+              value={form.firstName}
+              onChange={(e) => update("firstName", e.target.value)}
               className={inputClass}
             />
           </div>
-          <div>
-            <label className={labelClass}>Phone Number *</label>
+          <div className="w-1/2">
+            <label className={labelClass}>Last Name *</label>
             <input
-              type="tel"
-              placeholder="+233 XX XXX XXXX"
-              value={form.phone}
-              onChange={(e) => update("phone", e.target.value)}
+              type="text"
+              placeholder="Last name"
+              value={form.lastName}
+              onChange={(e) => update("lastName", e.target.value)}
               className={inputClass}
             />
           </div>
+        </div>
+        <div>
+          <label className={labelClass}>Email Address *</label>
+          <input
+            type="email"
+            placeholder="your@email.com"
+            value={form.email}
+            onChange={(e) => update("email", e.target.value)}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label className={labelClass}>Phone Number *</label>
+          <input
+            type="tel"
+            placeholder="+233 XX XXX XXXX"
+            value={form.phone}
+            onChange={(e) => update("phone", e.target.value)}
+            className={inputClass}
+          />
         </div>
       </div>
 
       {/* Event details */}
-      <div className="bg-white border border-[#e8d9cc] rounded-2xl overflow-hidden">
-        {/* <div className="h-1 bg-gradient-to-r from-[#d4b86a] to-[#7c5546]" /> */}
-        <div className="p-5 space-y-4">
-          <h3 className="font-semibold text-[#1a1a1a]">Event Details</h3>
+      <div className="bg-white border border-[#e8d9cc] rounded-2xl p-5 space-y-4">
+        <h3 className="font-semibold text-[#1a1a1a]">Event Details</h3>
+        <div>
+          <label className={labelClass}>Preferred Date *</label>
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => {
+              const selected = e.target.value;
+              if (blockedDates.includes(selected)) {
+                update("date", "");
+                setError(
+                  "This date is unavailable. Please choose another date.",
+                );
+              } else {
+                update("date", selected);
+              }
+            }}
+            min={new Date().toISOString().split("T")[0]}
+            className={`${inputClass} ${
+              blockedDates.includes(form.date) ? "border-red-300" : ""
+            }`}
+          />
+          {blockedDates.includes(form.date) && (
+            <p className="text-red-500 text-xs mt-1 pl-3">
+              This date is unavailable. Please choose another date.
+            </p>
+          )}
+          {blockedDates.length > 0 && (
+            <p className="text-xs text-gray-400 mt-1 pl-3">
+              Some dates may be unavailable due to existing bookings.
+            </p>
+          )}
+        </div>
+        <div>
+          <label className={labelClass}>Location / Venue</label>
+          <input
+            type="text"
+            placeholder="e.g. East Legon, Accra"
+            value={form.location}
+            onChange={(e) => update("location", e.target.value)}
+            className={inputClass}
+          />
+        </div>
+        {form.category === "Bridal" && (
           <div>
-            <label className={labelClass}>Preferred Date *</label>
+            <label className={labelClass}>Number of People</label>
             <input
-              type="date"
-              value={form.date}
-              onChange={(e) => {
-                const selected = e.target.value;
-                if (blockedDates.includes(selected)) {
-                  update("date", "");
-                  setError(
-                    "This date is unavailable. Please choose another date.",
-                  );
-                } else {
-                  update("date", selected);
-                }
-              }}
-              min={new Date().toISOString().split("T")[0]}
-              className={`${inputClass} ${
-                blockedDates.includes(form.date) ? "border-red-300" : ""
-              }`}
-            />
-            {blockedDates.includes(form.date) && (
-              <p className="text-red-500 text-xs mt-1 pl-3">
-                This date is unavailable. Please choose another date.
-              </p>
-            )}
-            {blockedDates.length > 0 && (
-              <p className="text-xs text-gray-400 mt-1 pl-3">
-                Some dates may be unavailable due to existing bookings.
-              </p>
-            )}
-          </div>
-          <div>
-            <label className={labelClass}>Location / Venue</label>
-            <input
-              type="text"
-              placeholder="e.g. East Legon, Accra"
-              value={form.location}
-              onChange={(e) => update("location", e.target.value)}
+              type="number"
+              placeholder="e.g. 4 (bride + bridesmaids)"
+              value={form.numberOfPeople}
+              min="1"
+              onChange={(e) => update("numberOfPeople", e.target.value)}
               className={inputClass}
             />
           </div>
-          {form.category === "Bridal" && (
-            <div>
-              <label className={labelClass}>Number of People</label>
-              <input
-                type="number"
-                placeholder="e.g. 4 (bride + bridesmaids)"
-                value={form.numberOfPeople}
-                min="1"
-                onChange={(e) => update("numberOfPeople", e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          )}
-          <div>
-            <label className={labelClass}>Special Requests / Notes</label>
-            <textarea
-              placeholder="Any specific requirements or notes..."
-              value={form.notes}
-              rows={3}
-              onChange={(e) => update("notes", e.target.value)}
-              className="w-full border border-[#e8d9cc] rounded-2xl px-5 py-3 text-sm
-                focus:outline-none focus:border-[#d4b86a] bg-white placeholder-gray-400
-                transition resize-none"
-            />
-          </div>
+        )}
+        <div>
+          <label className={labelClass}>Special Requests / Notes</label>
+          <textarea
+            placeholder="Any specific requirements or notes..."
+            value={form.notes}
+            rows={3}
+            onChange={(e) => update("notes", e.target.value)}
+            className="w-full border border-[#e8d9cc] rounded-2xl px-5 py-3
+              text-sm focus:outline-none focus:border-[#d4b86a] bg-white
+              placeholder-gray-400 transition resize-none"
+          />
         </div>
       </div>
 
       {/* Summary */}
-      <div className=" border border-[#d4b86a]/30 rounded-2xl p-4">
-        <p className="text-xs font-semibold text-[#d4b86a] uppercase tracking-wider mb-3">
+      <div className="border border-[#d4b86a]/30 rounded-2xl p-4">
+        <p
+          className="text-xs font-semibold text-[#d4b86a] uppercase
+          tracking-wider mb-3"
+        >
           Booking Summary
         </p>
         <div className="space-y-1.5 text-sm">
@@ -433,17 +433,18 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
           onClick={() => {
             setStep(1);
             setError("");
+            trackBooking("abandon", form.category);
           }}
-          className="w-1/3 px-4 py-3 rounded-full border border-gray-300
-            text-gray-500 text-sm hover:bg-gray-50 transition"
+          className="w-1/3 px-4 py-3 rounded-full border border-gray-200
+            text-gray-500 text-sm hover:border-gray-300 transition"
         >
-          ← Back
+          Back
         </button>
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="w-2/3 px-6 py-3 rounded-full bg-black text-white font-medium
-            hover:bg-gray-800 transition disabled:opacity-50 text-sm"
+          className="w-2/3 px-6 py-3 rounded-full bg-black text-white
+            font-medium hover:bg-gray-800 transition disabled:opacity-50 text-sm"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -454,7 +455,7 @@ export const BookingForm = ({ onSuccess, defaultCategory = "" }) => {
               Sending...
             </span>
           ) : (
-            "Submit Booking Request →"
+            "Submit Booking Request"
           )}
         </button>
       </div>

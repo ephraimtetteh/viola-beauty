@@ -29,9 +29,9 @@ const Navbar = () => {
   }, [pathname]);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 15);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const handle = () => setIsScrolled(window.scrollY > 15);
+    window.addEventListener("scroll", handle);
+    return () => window.removeEventListener("scroll", handle);
   }, []);
 
   const closeMenu = () => setMenuOpen(false);
@@ -44,15 +44,15 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between
-        px-4 md:px-8 lg:px-12 transition-all duration-500
-        ${isScrolled ? "py-3 bg-white shadow-md" : "py-5 bg-white"}`}
+      px-4 md:px-8 lg:px-12 transition-all duration-500
+      ${isScrolled ? "py-3 bg-white shadow-md" : "py-5 bg-white"}`}
     >
-      {/* ── LOGO ── */}
+      {/* Logo */}
       <Link to="/" className="text-2xl font-bold tracking-wide">
         Viola Beauty
       </Link>
 
-      {/* ── DESKTOP MENU ── */}
+      {/* Desktop nav */}
       <div className="hidden md:flex items-center gap-8 font-medium text-sm">
         <Link to="/" className={linkCls("/")}>
           Home
@@ -83,7 +83,6 @@ const Navbar = () => {
               />
             </svg>
           </button>
-
           <div
             className="absolute top-full left-0 mt-3 w-44 bg-white shadow-xl
             rounded-xl py-2 opacity-0 invisible translate-y-3
@@ -117,42 +116,48 @@ const Navbar = () => {
         ))}
       </div>
 
-      {/* ── DESKTOP RIGHT — auth + book ── */}
+      {/* Desktop right */}
       <div className="hidden md:flex items-center gap-3">
-        {user ? (
-          isAdmin ? (
-            <Link
-              to="/admin"
-              className="flex items-center gap-2 text-sm font-medium
-                text-[#d4b86a] hover:text-[#7c5546] transition"
+        {isAdmin ? (
+          // ── Admin is logged in — show admin panel link ──
+          <Link
+            to="/admin"
+            className={`flex items-center gap-2 text-sm font-medium transition
+              ${
+                pathname.startsWith("/admin")
+                  ? "text-[#d4b86a]"
+                  : "text-[#7c5546] hover:text-[#d4b86a]"
+              }`}
+          >
+            <span
+              className="w-7 h-7 rounded-full bg-[#1a1a1a] border border-[#d4b86a]
+              flex items-center justify-center text-xs font-bold text-[#d4b86a]"
             >
-              <span
-                className="w-7 h-7 rounded-full bg-[#1a1a1a] border border-[#d4b86a]
-                flex items-center justify-center text-xs font-bold text-[#d4b86a]"
-              >
-                A
-              </span>
-              Admin
-            </Link>
-          ) : (
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-2 text-sm font-medium
-                text-[#7c5546] hover:text-[#d4b86a] transition"
+              A
+            </span>
+            Dashboard
+          </Link>
+        ) : user ? (
+          // ── Regular user logged in ──
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-2 text-sm font-medium
+              text-[#7c5546] hover:text-[#d4b86a] transition"
+          >
+            <span
+              className="w-7 h-7 rounded-full bg-[#fdf6e3] border border-[#d4b86a]
+              flex items-center justify-center text-xs font-bold text-[#7c5546]"
             >
-              <span
-                className="w-7 h-7 rounded-full bg-[#fdf6e3] border border-[#d4b86a]
-                flex items-center justify-center text-xs font-bold text-[#7c5546]"
-              >
-                {user.firstName?.[0]}
-              </span>
-              {user.firstName}
-            </Link>
-          )
+              {user.firstName?.[0]}
+            </span>
+            {user.firstName}
+          </Link>
         ) : (
+          // ── Not logged in ──
           <Link
             to="/login"
-            className="text-sm font-medium text-gray-600 hover:text-[#d4b86a] transition"
+            className="text-sm font-medium text-gray-600
+              hover:text-[#d4b86a] transition"
           >
             Sign In
           </Link>
@@ -170,7 +175,7 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* ── MOBILE MENU BUTTON ── */}
+      {/* Mobile hamburger */}
       <button
         onClick={() => setMenuOpen(true)}
         className="md:hidden p-2 z-[60] relative"
@@ -186,18 +191,19 @@ const Navbar = () => {
         </svg>
       </button>
 
-      {/* ── MOBILE DRAWER ── */}
+      {/* Mobile drawer */}
       <div
         className={`fixed inset-0 bg-white z-[55] flex flex-col items-center
-          justify-center gap-6 text-lg font-medium transition-transform duration-500
-          md:hidden ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+        justify-center gap-6 text-lg font-medium transition-transform duration-500
+        md:hidden ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* Close button */}
+        {/* Close */}
         <button
           onClick={closeMenu}
-          className="absolute top-6 right-6 text-xl text-gray-400 hover:text-gray-600"
+          className="absolute top-6 right-6 text-xl text-gray-400
+            hover:text-gray-600"
         >
-          ✕
+          ×
         </button>
 
         {/* Brand */}
@@ -222,7 +228,10 @@ const Navbar = () => {
         ))}
 
         {/* About links */}
-        <div className="flex flex-col items-center gap-3 border-t border-[#f0e6dd] pt-4 w-40">
+        <div
+          className="flex flex-col items-center gap-3 border-t
+          border-[#f0e6dd] pt-4 w-40"
+        >
           {ABOUT_LINKS.map(({ to, label }) => (
             <Link
               key={to}
@@ -240,37 +249,38 @@ const Navbar = () => {
         </div>
 
         {/* Auth link */}
-        {user ? (
-          isAdmin ? (
-            <Link
-              to="/admin"
-              onClick={closeMenu}
-              className="flex items-center gap-2 text-[#d4b86a] font-medium"
+        {isAdmin ? (
+          // ── Admin — dashboard link ──
+          <Link
+            to="/admin"
+            onClick={closeMenu}
+            className="flex items-center gap-2 text-[#d4b86a] font-medium"
+          >
+            <span
+              className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#d4b86a]
+              flex items-center justify-center font-bold text-sm text-[#d4b86a]"
             >
-              <span
-                className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-[#d4b86a]
-                flex items-center justify-center font-bold text-sm text-[#d4b86a]"
-              >
-                A
-              </span>
-              Admin Panel
-            </Link>
-          ) : (
-            <Link
-              to="/dashboard"
-              onClick={closeMenu}
-              className="flex items-center gap-2 text-[#7c5546]"
+              A
+            </span>
+            Admin Dashboard
+          </Link>
+        ) : user ? (
+          // ── User ──
+          <Link
+            to="/dashboard"
+            onClick={closeMenu}
+            className="flex items-center gap-2 text-[#7c5546]"
+          >
+            <span
+              className="w-8 h-8 rounded-full bg-[#fdf6e3] border border-[#d4b86a]
+              flex items-center justify-center font-bold text-sm"
             >
-              <span
-                className="w-8 h-8 rounded-full bg-[#fdf6e3] border border-[#d4b86a]
-                flex items-center justify-center font-bold text-sm"
-              >
-                {user.firstName?.[0]}
-              </span>
-              My Account
-            </Link>
-          )
+              {user.firstName?.[0]}
+            </span>
+            My Account
+          </Link>
         ) : (
+          // ── Not logged in ──
           <Link
             to="/login"
             onClick={closeMenu}

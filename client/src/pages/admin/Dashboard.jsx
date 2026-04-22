@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 import Sidebar from "../../components/admin/Sidebar";
@@ -10,10 +10,16 @@ import BlockedDatesTab from "../../components/admin/BlockedDatesTab";
 import RatesTab from "../../components/admin/RatesTab";
 import FontsTab from "../../components/admin/FontsTab";
 import ClassesTab from "../../components/admin/tabs/ClassesTab";
+import ContentTab from "../../components/admin/tabs/ContentTab";
+import LiveTrackingTab from "../../components/admin/tabs/LiveTrackingTab";
+import CustomersTab from "../../components/admin/tabs/CustomerTab";
 
 const TABS = [
   { id: "bookings", label: "Bookings" },
+  { id: "content", label: "Content" },
+  { id: "live", label: "Live" },
   { id: "classes", label: "Classes" },
+  { id: "customers", label: "Customers" },
   { id: "blocked-dates", label: "Blocked Dates" },
   { id: "rates", label: "Rates" },
   { id: "fonts", label: "Fonts" },
@@ -50,11 +56,9 @@ export default function Dashboard() {
         className="bg-white border-b border-[#e8d9cc] px-6 py-4
         flex items-center justify-between sticky top-0 z-40"
       >
+        {/* Left — branding */}
         <div>
-          <p
-            className="text-xs tracking-[4px] uppercase text-[#d4b86a]
-            font-medium"
-          >
+          <p className="text-xs tracking-[4px] uppercase text-[#d4b86a] font-medium">
             Viola Beauty
           </p>
           <h1 className="text-lg font-semibold text-[#1a1a1a] leading-tight">
@@ -62,7 +66,19 @@ export default function Dashboard() {
           </h1>
         </div>
 
+        {/* Right — actions */}
         <div className="flex items-center gap-2">
+          {/* View website */}
+          <Link
+            to="/"
+            className="text-xs text-gray-500 hover:text-[#7c5546]
+              border border-[#e8d9cc] hover:border-[#d4b86a]
+              px-4 py-2 rounded-full transition"
+          >
+            View Site
+          </Link>
+
+          {/* Analytics sidebar */}
           <button
             onClick={() => setSidebarOpen(true)}
             className="text-xs text-gray-500 hover:text-[#7c5546]
@@ -71,6 +87,8 @@ export default function Dashboard() {
           >
             Analytics
           </button>
+
+          {/* Sign out */}
           <button
             onClick={handleLogout}
             className="text-xs text-gray-400 hover:text-gray-600
@@ -111,6 +129,9 @@ export default function Dashboard() {
         {tab === "fonts" && <FontsTab />}
         {tab === "activity" && <ActivityTab />}
         {tab === "settings" && <SettingsTab />}
+        {tab === "content" && <ContentTab />}
+        {tab === "live" && <LiveTrackingTab />}
+        {tab === "customers" && <CustomersTab />}
       </div>
 
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />

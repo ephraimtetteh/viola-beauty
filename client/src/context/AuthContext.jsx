@@ -16,18 +16,35 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    // Verify token and get user info
     fetch(`${API}/api/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data) setUser(data);
-        else logout();
+        if (data) {
+          setUser(data);
+        } else {
+          // ── Token invalid — clear only if not admin ──
+          // If token exists but /me fails, don't wipe an admin session
+          // silently. Instead clear and let them re-login.
+          clearSession();
+        }
       })
-      .catch(() => logout())
+      .catch(() => {
+        // ── Network error — keep token, don't log out ──
+        // Admin stays logged in if backend is temporarily unreachable.
+        // User object will be null but token is preserved so next
+        // successful request will restore the session.
+        setLoading(false);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const clearSession = () => {
+    setUser(null);
+    setToken("");
+    localStorage.removeItem("viola_token");
+  };
 
   const login = (userData, userToken) => {
     setUser(userData);
@@ -35,10 +52,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("viola_token", userToken);
   };
 
+  // ── Intentional logout — only way session is cleared ──
   const logout = () => {
-    setUser(null);
-    setToken("");
-    localStorage.removeItem("viola_token");
+    clearSession();
   };
 
   const updateUser = (data) => setUser((prev) => ({ ...prev, ...data }));

@@ -5,66 +5,65 @@ import RateCard from "./BridalRates";
 
 const API = import.meta.env.VITE_API_URL;
 
+const DEFAULT_PACKAGES = [
+  {
+    name: "Traditional Wedding",
+    price: "GHS 4,000",
+    features: [
+      "Makeup at venue for traditional ceremony",
+      "Hand application",
+      "Two-hour service",
+    ],
+  },
+  {
+    name: "White Wedding",
+    price: "GHS 5,000",
+    features: [
+      "Makeup at venue for white wedding",
+      "Clean classic look",
+      "Hand application",
+      "Three hour service",
+    ],
+  },
+  {
+    name: "Double Dose",
+    price: "GHS 7,000",
+    features: [
+      "Makeup for traditional wedding",
+      "Makeup for white wedding",
+      "Hand application",
+      "2–3 hour service each day",
+      "Complimentary makeup for bride's mum",
+    ],
+  },
+];
+
 export default function April() {
-  const [packages, setPackages] = useState([
-    {
-      name: "Traditional Wedding",
-      price: "GHS 4,000",
-      features: [
-        "Makeup application at a given venue for traditional marriage ceremony",
-        "Hand application",
-        "Two-hour service",
-      ],
-    },
-    {
-      name: "White Wedding",
-      price: "GHS 5,000",
-      features: [
-        "Makeup application at a given venue for white wedding",
-        "This is a clean, classic look that involves more time",
-        "Hand application",
-        "Three hour service",
-      ],
-    },
-    {
-      name: "Double Dose",
-      price: "GHS 7,000",
-      features: [
-        "Makeup for traditional wedding",
-        "Makeup for white wedding",
-        "Hand application",
-        "2–3 hour service on each day",
-        "Complimentary makeup for bride's mum on wedding day",
-      ],
-    },
-  ]);
+  const [packages, setPackages] = useState(DEFAULT_PACKAGES);
+  const [desc, setDesc] = useState("");
+  const [image, setImage] = useState("");
 
   useEffect(() => {
-    fetch(`${API}/api/settings/rates`)
-      .then((r) => r.json())
-      .then((data) => {
-        const bridal = data?.bridal;
+    Promise.all([
+      fetch(`${API}/api/settings/rates`).then((r) => r.json()),
+      fetch(`${API}/api/settings/rates_content`).then((r) => r.json()),
+    ])
+      .then(([rates, content]) => {
+        if (content?.april_description) setDesc(content.april_description);
+        if (content?.april_image) setImage(content.april_image);
+        const bridal = rates?.bridal;
         if (!bridal?.length) return;
-        // Map April packages from bridal rates
-        const april = bridal.filter(
-          (p) =>
-            p.name.toLowerCase().includes("april") ||
-            p.name.toLowerCase().includes("traditional") ||
-            p.name.toLowerCase().includes("white wedding") ||
-            p.name.toLowerCase().includes("double dose"),
+        setPackages((prev) =>
+          prev.map((pkg) => {
+            const match = bridal.find((b) =>
+              b.name
+                .toLowerCase()
+                .replace(/\s+/g, "")
+                .includes(pkg.name.toLowerCase().replace(/\s+/g, "")),
+            );
+            return match ? { ...pkg, price: match.price } : pkg;
+          }),
         );
-        if (april.length) {
-          setPackages((prev) =>
-            prev.map((pkg) => {
-              const match = bridal.find((b) =>
-                b.name
-                  .toLowerCase()
-                  .includes(pkg.name.toLowerCase().split(" ")[0]),
-              );
-              return match ? { ...pkg, price: match.price } : pkg;
-            }),
-          );
-        }
       })
       .catch(console.error);
   }, []);
@@ -73,8 +72,11 @@ export default function April() {
     <div>
       <BrideSection
         title="The April Bride"
-        image={rateImages[8]}
-        description="April is the peak of the spring season. Springtime is when we begin to see a little of the sun, and flowers start to blossom. If your personality reflects the springtime—laidback yet outgoing, subtle yet present—then you're Viola's April bride."
+        image={image || rateImages[8]}
+        description={
+          desc ||
+          "April is the peak of the spring season. Springtime is when we begin to see a little of the sun, and flowers start to blossom. If your personality reflects the springtime—laidback yet outgoing, subtle yet present—then you're Viola's April bride."
+        }
         features={[
           "Clean matte or dewy skin that perfectly matches your complexion",
           "Subtle highlighting and contouring to enhance facial structure",

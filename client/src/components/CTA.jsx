@@ -14,7 +14,7 @@ const slides = [
     link: "/book-us",
   },
   {
-    title: "Discover Amazing Deals",
+    title: "Our Retial Store",
     image: images.company2,
     link: "/shop",
   },
@@ -44,7 +44,7 @@ const CTA = () => {
 
                 {/* Content */}
                 <div className="relative z-10 px-6 max-w-3xl">
-                  <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight">
+                  <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight uppercase">
                     {slide.title}
                   </h1>
 

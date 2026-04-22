@@ -9,7 +9,7 @@ const DEFAULT_SERVICES = [
     price: "GHS 800 per head",
     note: "GHS 750 per head for 4 or more",
   },
-  { title: "Civil Wedding", price: "GHS 2,500", note: null },
+  { title: "Civil Wedding", price: "GHS 3,000", note: null },
   { title: "Sunday Thanksgiving Glam", price: "GHS 2,000", note: null },
   {
     title: "Mother of the Bride (By Head Artist)",

@@ -1,25 +1,34 @@
+import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { useNavigate } from "react-router-dom";
-import { slides } from "../constants/data";
+import { slides as defaultSlides } from "../constants/data";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
-import { useEffect } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
+const API = import.meta.env.VITE_API_URL;
 
 export default function HeroSlider() {
   const navigate = useNavigate();
+  const [slides, setSlides] = useState(defaultSlides);
 
   useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      easing: "ease-out-cubic",
-      once: false,
-    });
+    fetch(`${API}/api/settings/hero_slides`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!Array.isArray(data) || !data.length) return;
+        // Merge API text with local images as fallback
+        setSlides(
+          data.map((s, i) => ({
+            ...defaultSlides[i],
+            ...s,
+            image: s.image || defaultSlides[i]?.image,
+          })),
+        );
+      })
+      .catch(console.error);
   }, []);
 
   return (
@@ -36,36 +45,37 @@ export default function HeroSlider() {
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
             <div
-              className="hero-slide relative h-full w-full bg-cover bg-center
-                md:bg-[center_30%]"
+              className="relative h-full w-full bg-cover bg-center"
               style={{ backgroundImage: `url(${slide.image})` }}
             >
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-black/30" />
-
-              {/* Content — pt-16 offsets the fixed navbar height */}
               <div
-  className="absolute inset-x-0 bottom-0 top-16 flex flex-col items-center
-  justify-center text-center text-white px-6 translate-y-[-5%]"
->
+                className="absolute inset-0 bg-gradient-to-t
+                from-black/60 via-black/20 to-black/10"
+              />
+
+              <div
+                className="absolute inset-0 flex flex-col items-center
+                justify-center text-center text-white px-6 pt-16"
+              >
                 <div data-aos="fade-up">
                   <h1
                     className="text-3xl sm:text-4xl md:text-6xl mb-5
-                    tracking-wide leading-tight uppercase"
+                    tracking-wide leading-tight uppercase font-semibold"
                   >
                     {slide.title}
                   </h1>
-                  <p
-                    className="text-base sm:text-lg md:text-xl mb-8
-                    max-w-xl mx-auto text-white/90"
-                  >
-                    {slide.subtitle}
-                  </p>
+                  {slide.subtitle && (
+                    <p
+                      className="text-base sm:text-lg md:text-xl mb-8
+                      max-w-xl mx-auto text-white/90"
+                    >
+                      {slide.subtitle}
+                    </p>
+                  )}
                   <button
                     onClick={() => navigate(slide.link)}
                     className="px-8 py-3 border border-white/80 rounded-full
-                      hover:bg-white hover:text-black transition-all duration-300
-                      font-medium"
+                      hover:bg-white hover:text-black transition-all duration-300"
                   >
                     Explore
                   </button>
