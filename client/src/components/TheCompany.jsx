@@ -62,11 +62,11 @@ export default function TheCompany() {
           <h2 className="text-4xl sm:text-5xl font-semibold text-[#1a1a1a] leading-tight">
             The Company
           </h2>
-          <div className="flex items-center justify-center gap-3 mt-5">
+          {/* <div className="flex items-center justify-center gap-3 mt-5">
             <div className="h-px w-12 bg-[#e8d9cc]" />
             <div className="w-1.5 h-1.5 rounded-full bg-[#d4b86a]" />
             <div className="h-px w-12 bg-[#e8d9cc]" />
-          </div>
+          </div> */}
           {companyQuote && (
             <p
               className="text-gray-500 italic text-base mt-8 max-w-2xl mx-auto

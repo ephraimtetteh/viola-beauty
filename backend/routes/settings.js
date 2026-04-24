@@ -83,12 +83,40 @@ const DEFAULTS = {
   ],
   // ── About page ──
   about_content: {
-    hero_image: "",
+    // ── Artist page ──
     artist_name: "Vincentia Ocloo",
     artist_bio:
       "My journey begun in 2014 with students in my university. With over 1000 clients since then, I have garnered a great deal of knowledge of the art on different skin tones and face shapes through experience.",
+    artist_section_1:
+      "I remember so vividly how much I looked forward to Sundays because I got to wear my mum's foundation and lipstick and choose my own clothes for church. I was about ten years old and I think this was the highlight of my week after all the bore from school.",
+    artist_section_2:
+      "In my teenage years, I started trying new makeup products. I would sneak into my older cousins' makeup bags and experiment with blushes, eyeshadow, mascaras and liners. By university, I already had a fair idea of makeup and its application and thankfully, all my close friends did too.",
+    artist_section_3:
+      "People all around me loved makeup and that fuelled my interest and love for it. Some of my friends in school started asking me to do their makeup after they had seen mine and before I knew it, I had turned what I loved into a small business.",
+    artist_section_4:
+      "My greatest desire and hope on this journey is to help you search within and find the well of beauty inside that is waiting to be unearthed.",
+    artist_quote:
+      "True beauty is on the inside. When wearing your makeup, remember to wear your personality and who you truly are.",
+    artist_image_1: "",
+    artist_image_2: "",
+    artist_image_3: "",
+    artist_image_4: "",
+    // ── Company page ──
     company_quote:
       "At Viola Beauty, we believe that who you are on the inside runs parallel with how you like to look on the outside.",
+    company_info_0_title: "Artistry",
+    company_info_0_subtitle:
+      "My journey begun in 2014 with students in my university. With over 1000 clients since then, I have garnered a great deal of knowledge of the art on different skin tones and face shapes through experience. The consistent and repetitive nature of my work has honed and is still honing my craft.",
+    company_info_0_image: "",
+    company_info_1_title: "Education & Speaking",
+    company_info_1_subtitle:
+      "The business and art of makeup is finally getting all the recognition it deserves worldwide. With all that I have learnt over the period of my artistry, I believe I must contribute my quota to the industry by pouring into anyone who wants to pursue a career in beauty.",
+    company_info_1_image: "",
+    company_info_2_title: "Influencer Marketing",
+    company_info_2_subtitle:
+      "For nine years, I have studied and worked with an extensive spread of different brands of makeup products and I have learnt so much about what formula works for which skin, which product produces what finish, and the multipurpose use of products.",
+    company_info_2_image: "",
+    hero_image: "",
     company_image: "",
   },
   // ── Rates page text ──
