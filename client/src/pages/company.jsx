@@ -19,8 +19,8 @@ const Company = () => {
   return (
     <div className='overflow-hidden' >
       <Hero
-        image={images.company}
-        // title={"Discover your signature discover you!"}
+        image={images.slide3}
+        title={"Discover your signature discover you!"}
         className={"text-4xl"}
         data-aos='zoom-in'
       />

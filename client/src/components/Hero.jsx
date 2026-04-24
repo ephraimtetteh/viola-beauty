@@ -24,7 +24,7 @@ const Hero = ({image, title, className, tagline, subline}) => {
         {/* Content */}
 
         <div className={`${className} relative z-10 flex h-full flex-col items-center justify-center text-center text-white/80 px-6`}>
-          <h3 className="text-[20px] font-bold tracking-wide">
+          <h3 className="text-2xl font-bold tracking-wide">
             {title}
           </h3>
           <p>{tagline}</p>
