@@ -1,5 +1,9 @@
 import { motion } from "framer-motion";
 import { infos } from "../constants/data";
+import { useEffect, useState } from "react";
+
+
+const API = import.meta.env.VITE_API_URL;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -15,7 +19,32 @@ const fadeScale = {
   },
 };
 
+
 export default function TheCompany() {
+  const [items, setItems] = useState(infos);
+  const [companyQuote, setCompanyQuote] = useState(
+    "At Viola Beauty, we believe that who you are on the inside runs parallel with how you like to look on the outside.",
+  );
+
+  useEffect(() => {
+    fetch(`${API}/api/settings/about_content`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data) return;
+        if (data.company_quote) setCompanyQuote(data.company_quote);
+
+        // Build sections from saved data, fall back to infos from data.js
+        const updated = infos.map((info, i) => ({
+          ...info,
+          title: data[`company_info_${i}_title`] || info.title,
+          subtitle: data[`company_info_${i}_subtitle`] || info.subtitle,
+          image: data[`company_info_${i}_image`] || info.image,
+        }));
+        setItems(updated);
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <section className="w-full py-24 px-4">
       <div className="max-w-5xl mx-auto">
@@ -27,16 +56,10 @@ export default function TheCompany() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <p
-            className="text-xs tracking-[5px] uppercase text-[#d4b86a]
-            font-medium mb-4"
-          >
+          <p className="text-xs tracking-[5px] uppercase text-[#d4b86a] font-medium mb-4">
             About
           </p>
-          <h2
-            className="text-4xl sm:text-5xl font-semibold text-[#1a1a1a]
-            leading-tight"
-          >
+          <h2 className="text-4xl sm:text-5xl font-semibold text-[#1a1a1a] leading-tight">
             The Company
           </h2>
           <div className="flex items-center justify-center gap-3 mt-5">
@@ -44,15 +67,22 @@ export default function TheCompany() {
             <div className="w-1.5 h-1.5 rounded-full bg-[#d4b86a]" />
             <div className="h-px w-12 bg-[#e8d9cc]" />
           </div>
+          {companyQuote && (
+            <p
+              className="text-gray-500 italic text-base mt-8 max-w-2xl mx-auto
+              leading-relaxed"
+            >
+              "{companyQuote}"
+            </p>
+          )}
         </motion.div>
 
         {/* Stacked sections */}
         <div className="space-y-32">
-          {infos.map((info, index) => {
+          {items.map((info, index) => {
             const isEven = index % 2 === 0;
             return (
               <div key={index} className="space-y-10">
-                {/* Index + title */}
                 <motion.div
                   variants={fadeUp}
                   initial="hidden"
@@ -62,29 +92,20 @@ export default function TheCompany() {
                     isEven ? "flex-row" : "flex-row-reverse text-right"
                   }`}
                 >
-                  <span
-                    className="text-[#d4b86a] text-xs font-medium
-                    tracking-widest mt-1 flex-shrink-0"
-                  >
+                  <span className="text-[#d4b86a] text-xs font-medium tracking-widest mt-1 flex-shrink-0">
                     0{index + 1}
                   </span>
-                  <h3
-                    className="text-2xl sm:text-3xl font-semibold
-                    text-[#1a1a1a] leading-snug"
-                  >
+                  <h3 className="text-2xl sm:text-3xl font-semibold text-[#1a1a1a] leading-snug">
                     {info.title}
                   </h3>
                 </motion.div>
 
-                {/* Image */}
                 <motion.div
                   variants={fadeScale}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-60px" }}
-                  className={`w-full ${
-                    isEven ? "md:w-[90%] ml-auto" : "md:w-[90%] mr-auto"
-                  }`}
+                  className={`w-full ${isEven ? "md:w-[90%] ml-auto" : "md:w-[90%] mr-auto"}`}
                 >
                   <div className="rounded-2xl overflow-hidden">
                     <img
@@ -98,28 +119,19 @@ export default function TheCompany() {
                   </div>
                 </motion.div>
 
-                {/* Body text */}
                 <motion.div
                   variants={fadeUp}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-60px" }}
-                  className={`${
-                    isEven
-                      ? "md:pl-16 md:w-[80%]"
-                      : "md:pr-16 md:w-[80%] ml-auto text-right"
-                  }`}
+                  className={`${isEven ? "md:pl-16 md:w-[80%]" : "md:pr-16 md:w-[80%] ml-auto text-right"}`}
                 >
-                  <p
-                    className="text-gray-600 text-base sm:text-lg
-                    leading-relaxed text-justify"
-                  >
+                  <p className="text-gray-600 text-base sm:text-lg leading-relaxed text-justify">
                     {info.subtitle}
                   </p>
                 </motion.div>
 
-                {/* Divider — not after last */}
-                {index < infos.length - 1 && (
+                {index < items.length - 1 && (
                   <div className="flex items-center gap-4 pt-4">
                     <div className="flex-1 h-px bg-[#f0e6dd]" />
                     <div className="w-1.5 h-1.5 rounded-full bg-[#d4b86a]" />

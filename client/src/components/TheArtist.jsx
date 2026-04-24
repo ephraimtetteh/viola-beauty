@@ -5,38 +5,18 @@ import { images } from "../constants/data";
 
 const API = import.meta.env.VITE_API_URL;
 
-const SECTIONS = [
-  {
-    image: images.about3,
-    text: `I remember so vividly how much I looked forward to Sundays because I
-got to wear my mum's foundation and lipstick and choose my own clothes for
-church. I was about ten years old and I think this was the highlight of my
-week after all the bore from school.`,
-  },
-  {
-    image: images.about2,
-    text: `In my teenage years, I started trying new makeup products. I would sneak
-into my older cousins' makeup bags and experiment with blushes, eyeshadow,
-mascaras and liners. By university, I already had a fair idea of makeup and
-its application and thankfully, all my close friends did too. We would skip
-class to have long hours of glam time only to wipe it all off because we had
-nowhere to go.`,
-  },
-  {
-    image: images.about4,
-    text: `People all around me loved makeup and that fuelled my interest and love
-for it. Some of my friends in school started asking me to do their makeup
-after they had seen mine and before I knew it, I had turned what I loved into
-a small business. I believe these were the formative years of what is now my
-career in beauty and I've been at it ever since.`,
-  },
-  {
-    image: images.about5,
-    text: `My greatest desire and hope on this journey is to help you search within
-and find the well of beauty inside that is waiting to be unearthed. True
-beauty is on the inside — when wearing your makeup, remember to wear your
-personality and who you truly are.`,
-  },
+const DEFAULT_IMAGES = [
+  images.about3,
+  images.about2,
+  images.about4,
+  images.about5,
+];
+
+const DEFAULT_SECTIONS = [
+  `I remember so vividly how much I looked forward to Sundays because I got to wear my mum's foundation and lipstick and choose my own clothes for church. I was about ten years old and I think this was the highlight of my week after all the bore from school.`,
+  `In my teenage years, I started trying new makeup products. I would sneak into my older cousins' makeup bags and experiment with blushes, eyeshadow, mascaras and liners. By university, I already had a fair idea of makeup and its application and thankfully, all my close friends did too. We would skip class to have long hours of glam time only to wipe it all off because we had nowhere to go.`,
+  `People all around me loved makeup and that fuelled my interest and love for it. Some of my friends in school started asking me to do their makeup after they had seen mine and before I knew it, I had turned what I loved into a small business. I believe these were the formative years of what is now my career in beauty.`,
+  `My greatest desire and hope on this journey is to help you search within and find the well of beauty inside that is waiting to be unearthed.`,
 ];
 
 const fadeUp = {
@@ -44,15 +24,38 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
 
-export default function TheArtist() {
-  const [artistBio, setArtistBio] = useState("");
+const fadeScale = {
+  hidden: { opacity: 0, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.7, ease: "easeOut", delay: 0.1 },
+  },
+};
 
-  // Pull editable bio from admin content settings if set
+export default function TheArtist() {
+  const [artistName, setArtistName] = useState("Vincentia Ocloo");
+  const [artistQuote, setArtistQuote] = useState(
+    "True beauty is on the inside. When wearing your makeup, remember to wear your personality and who you truly are.",
+  );
+  const [sections, setSections] = useState(
+    DEFAULT_SECTIONS.map((text, i) => ({ text, image: DEFAULT_IMAGES[i] })),
+  );
+
   useEffect(() => {
     fetch(`${API}/api/settings/about_content`)
       .then((r) => r.json())
       .then((data) => {
-        if (data?.artist_bio) setArtistBio(data.artist_bio);
+        if (!data) return;
+        if (data.artist_name) setArtistName(data.artist_name);
+        if (data.artist_quote) setArtistQuote(data.artist_quote);
+
+        setSections(
+          [1, 2, 3, 4].map((n, i) => ({
+            text: data[`artist_section_${n}`] || DEFAULT_SECTIONS[i],
+            image: data[`artist_image_${n}`] || DEFAULT_IMAGES[i],
+          })),
+        );
       })
       .catch(console.error);
   }, []);
@@ -60,7 +63,7 @@ export default function TheArtist() {
   return (
     <section className="w-full py-24 px-4">
       <div className="max-w-3xl mx-auto">
-        {/* ── Section label ── */}
+        {/* Section label */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -78,7 +81,7 @@ export default function TheArtist() {
             className="text-4xl sm:text-5xl font-semibold text-[#1a1a1a]
             leading-tight"
           >
-            Vincentia Ocloo
+            {artistName}
           </h2>
           <div className="flex items-center justify-center gap-3 mt-5">
             <div className="h-px w-12 bg-[#e8d9cc]" />
@@ -87,13 +90,13 @@ export default function TheArtist() {
           </div>
         </motion.div>
 
-        {/* ── Stacked sections: text → image → text → image ── */}
+        {/* Stacked sections */}
         <div className="space-y-20">
-          {SECTIONS.map((section, i) => {
+          {sections.map((section, i) => {
             const isEven = i % 2 === 0;
             return (
               <div key={i}>
-                {/* Text block */}
+                {/* Text */}
                 <motion.div
                   variants={fadeUp}
                   initial="hidden"
@@ -105,25 +108,13 @@ export default function TheArtist() {
                     className="text-gray-600 text-base sm:text-lg
                     leading-relaxed text-justify"
                   >
-                    {/* Use editable bio for first paragraph if set */}
-                    {i === 0 && artistBio ? artistBio : section.text}
+                    {section.text}
                   </p>
                 </motion.div>
 
-                {/* Image block */}
+                {/* Image */}
                 <motion.div
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.97 },
-                    visible: {
-                      opacity: 1,
-                      scale: 1,
-                      transition: {
-                        duration: 0.7,
-                        ease: "easeOut",
-                        delay: 0.1,
-                      },
-                    },
-                  }}
+                  variants={fadeScale}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-60px" }}
@@ -147,7 +138,7 @@ export default function TheArtist() {
           })}
         </div>
 
-        {/* ── Quote ── */}
+        {/* Quote */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -156,16 +147,15 @@ export default function TheArtist() {
           className="text-center mt-24 space-y-3"
         >
           <p
-            className="text-xl sm:text-2xl text-[#7c5546] italic
-            font-semibold leading-relaxed max-w-xl mx-auto"
+            className="text-xl sm:text-2xl text-[#7c5546] italic font-semibold
+            leading-relaxed max-w-xl mx-auto"
           >
-            "True beauty is on the inside. When wearing your makeup, remember to
-            wear your personality and who you truly are."
+            "{artistQuote}"
           </p>
           <p className="text-sm text-[#d4b86a]">— Viola's Secrets</p>
         </motion.div>
 
-        {/* ── CTA ── */}
+        {/* CTA */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
