@@ -32,7 +32,7 @@ const Courses = () => {
     <section className="bg-[#fff8f5] py-20 px-4">
       <div className="max-w-6xl mx-auto text-center">
         {/* HEADER */}
-        <button className="bg-neutral-800 text-sm text-white/80 px-6 py-2.5 rounded-full">
+        <button className="bg-transparent text-sm text-[#d4b86a] px-6 py-2.5 rounded-full">
           The Signature Glam Series
         </button>
 
@@ -72,7 +72,7 @@ const Courses = () => {
         <Link to={'/courses'}
          
          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-         className="inline-block bg-transparent border border-black hover:bg-neutral-700 transition text-sm text-black px-8 py-3 rounded-full mt-12"
+         className="inline-block bg-black  border hover:border-black hover:bg-transparent transition text-sm text-white hover:text-black px-8 py-3 rounded-full mt-12"
        >
          Explore
        </Link>

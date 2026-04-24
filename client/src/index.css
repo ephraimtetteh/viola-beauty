@@ -58,3 +58,20 @@ body{
   from { transform: scale(1); }
   to { transform: scale(1.08); }
 }
+
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  width: 45px;
+  height: 45px;
+  border-radius: 9999px;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: bold;
+}

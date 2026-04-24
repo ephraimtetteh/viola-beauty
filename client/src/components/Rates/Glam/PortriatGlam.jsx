@@ -6,7 +6,7 @@ const API = import.meta.env.VITE_API_URL;
 const DEFAULT_SERVICES = [
   {
     name: "Essentials",
-    price: "GHS 1,000",
+    price: "GHS 1000",
     duration: "75 mins",
     features: [
       "Custom photo-ready full face glam",
@@ -74,7 +74,7 @@ export default function EssentialsServices() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h3 className="text-sm tracking-widest text-[#7c5546] uppercase">
-            Essentials & Campaigns
+            A Day In My Chair
           </h3>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3">
             Portraits <span className="text-[#7c5546]">Glam</span>

@@ -127,31 +127,31 @@ export const infos = [
 
 export const cardData = [
   {
-    title: "Unlock Your Creative Flow",
+    title: "",
     image: client33,
   },
   {
-    title: "Think Big, Code Smart",
+    title: "",
     image: client31,
   },
   {
-    title: "Unlock Your Creative Flow",
+    title: "",
     image: client34,
   },
   {
-    title: "Unlock Your Creative Flow",
+    title: "",
     image: client30,
   },
   {
-    title: "Unlock Your Creative Flow",
+    title: "",
     image: client32,
   },
   {
-    title: "Unlock Your Creative Flow",
+    title: "",
     image: client1,
   },
   {
-    title: "Design Your Digital Future",
+    title: "",
     image: client3a,
   },
   {
@@ -159,20 +159,20 @@ export const cardData = [
     image: client5,
   },
   {
-    title: "Think Big, Code Smart",
+    title: "",
     image: client6a,
   },
 
   {
-    title: "Think Big, Code Smart",
+    title: "",
     image: client35,
   },
   {
-    title: "Think Big, Code Smart",
+    title: "",
     image: client37,
   },
   {
-    title: "Design Your Digital Future",
+    title: "",
     image: client9,
   },
   {
@@ -180,11 +180,11 @@ export const cardData = [
     image: client7,
   },
   {
-    title: "Think Big, Code Smart",
+    title: "",
     image: client6a,
   },
   {
-    title: "Think Big, Code Smart",
+    title: "",
     image: client10,
   },
 ];

@@ -19,14 +19,14 @@ const Rates = () => {
   
     const sectionImages = {
       Bridal: rateImages,
-      Classes: rateImages,
+      Courses: rateImages,
       "Glam Sessions": rateImages,
     };
   
     
     const sectionDefaultIndex = {
       Bridal: 13,
-      Classes: 14,
+      Courses: 14,
       "Glam Sessions": 3,
     };
   
@@ -63,9 +63,9 @@ const Rates = () => {
               Experience
             </h1>
 
-            <p className="text-gray-500 max-w-md mx-auto lg:mx-0 text-sm sm:text-base">
+            {/* <p className="text-gray-500 max-w-md mx-auto lg:mx-0 text-sm sm:text-base">
               2026
-            </p>
+            </p> */}
           </div>
 
           {/* RIGHT IMAGE */}
@@ -181,7 +181,7 @@ const Rates = () => {
         </div>
       )}
 
-      {activeSection === "Classes" && (
+      {activeSection === "Courses" && (
         <div>
           <RateCourses />
           <RateClases />
@@ -198,7 +198,7 @@ const Rates = () => {
 
       {/* ================= FLOATING NAV ================= */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-2 bg-white/40 backdrop-blur-xl shadow-lg rounded-full px-3 py-2">
-        {["Bridal", "Classes", "Glam Sessions"].map((item) => (
+        {["Bridal", "Courses", "Glam Sessions"].map((item) => (
           <button
             key={item}
             onClick={() => {
@@ -216,7 +216,7 @@ const Rates = () => {
         ))}
       </div>
 
-      {activeSection !== "Glam Sessions" && <TermsAndConditions />}
+      {activeSection !== "Glam Sessions" && activeSection !== "Courses" && <TermsAndConditions />}
       <PaymentDetails />
     </div>
   );

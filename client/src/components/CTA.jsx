@@ -53,8 +53,8 @@ const CTA = () => {
                   <button
                     className="
                       px-8 py-3
-                      bg-transparent border border-black
-                      text-black font-semibold rounded-full mt-10
+                      bg-transparent border border-white
+                      text-white font-semibold rounded-full mt-10
                       shadow-lg hover:scale-105 transition
                     "
                   >

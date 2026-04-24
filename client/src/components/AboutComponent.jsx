@@ -75,7 +75,7 @@ const AboutComponent = () => {
           </p>
           <Link
             to="/about"
-            className="flex items-center w-max gap-2 mt-8 hover:-translate-y-0.5 transition bg-transparent border border-black py-3 px-8 rounded-full text-black"
+            className="flex items-center w-max gap-2 mt-8 hover:-translate-y-0.5 transition bg-black hover:bg-transparent hover:text-black border border-black py-3 px-8 rounded-full text-white"
           >
             <span>Read more</span>
             {/* <svg
