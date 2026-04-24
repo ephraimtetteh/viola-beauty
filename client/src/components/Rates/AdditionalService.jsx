@@ -5,6 +5,11 @@ const API = import.meta.env.VITE_API_URL;
 
 const DEFAULT_SERVICES = [
   {
+    title: "Trial & Consultation",
+    price: "GHS 1,000",
+    note: "Preview your look and connect with the artist before your big day",
+  },
+  {
     title: "Bridesmaid Glam (By Other Artist)",
     price: "GHS 800 per head",
     note: "GHS 750 per head for 4 or more",
@@ -42,10 +47,14 @@ export default function AdditionalServices() {
         if (!bridal?.length) return;
         setServices((prev) =>
           prev.map((svc) => {
-            const match = bridal.find((b) =>
-              b.name
-                .toLowerCase()
-                .includes(svc.title.toLowerCase().split(" ")[0]),
+            const match = bridal.find(
+              (b) =>
+                b.name
+                  .toLowerCase()
+                  .includes(svc.title.toLowerCase().split(" ")[0]) ||
+                svc.title
+                  .toLowerCase()
+                  .includes(b.name.toLowerCase().split(" ")[0]),
             );
             return match ? { ...svc, price: match.price } : svc;
           }),
@@ -70,6 +79,9 @@ export default function AdditionalServices() {
             us understand your skin type, complexion, and any special conditions
             needed for the perfect bridal finish.
           </p>
+          <span className="text-[#7c5546] font-bold text-base flex-shrink-0">
+            GHS 1,000
+          </span>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-10 items-start">

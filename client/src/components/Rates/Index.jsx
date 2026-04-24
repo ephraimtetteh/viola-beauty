@@ -13,6 +13,7 @@ import RateClases from "./RateClasses";
 import GlamServices from "./Glam/Index";
 import EssentialsServices from "./Glam/PortriatGlam";
 import StudioServices from "./Glam/Studio";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Rates = () => {
     const [activeSection, setActiveSection] = useState("Bridal");
@@ -21,6 +22,13 @@ const Rates = () => {
       Bridal: rateImages,
       Courses: rateImages,
       "Glam Sessions": rateImages,
+    };
+
+
+    const SECTION_LABELS = {
+      Bridal: { word: "The Bridal", sub: "Experience" },
+      Courses: { word: "Beauty", sub: "Courses" },
+      "Glam Sessions": { word: "Glam", sub: "Session" },
     };
   
     
@@ -55,12 +63,34 @@ const Rates = () => {
               Viola Beauty
             </h3>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight">
-              The{" "}
-              <span className="text-[#d4b86a] break-words">
-                {activeSection}
-              </span>{" "}
-              Experience
+            <h1
+              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold
+  leading-tight"
+            >
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={activeSection}
+                  initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -16, filter: "blur(4px)" }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="inline-block text-[#d4b86a]"
+                >
+                  {SECTION_LABELS[activeSection]?.word ?? activeSection}
+                </motion.span>
+              </AnimatePresence>{" "}
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={activeSection + "-sub"}
+                  initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -16, filter: "blur(4px)" }}
+                  transition={{ duration: 0.35, ease: "easeOut", delay: 0.06 }}
+                  className="inline-block"
+                >
+                  {SECTION_LABELS[activeSection]?.sub ?? "Experience"}
+                </motion.span>
+              </AnimatePresence>
             </h1>
 
             {/* <p className="text-gray-500 max-w-md mx-auto lg:mx-0 text-sm sm:text-base">
@@ -141,9 +171,7 @@ const Rates = () => {
               " True beauty is on the inside. When wearing your makeup, remember
               to wear your personality and who you truly are "
             </p>
-            <p className="text-[#d4b86a] text-end ">
-              Viola's Secrets
-            </p>
+            <p className="text-[#d4b86a] text-end ">Viola's Secrets</p>
           </div>
 
           {/* FEATURES */}
@@ -216,7 +244,9 @@ const Rates = () => {
         ))}
       </div>
 
-      {activeSection !== "Glam Sessions" && activeSection !== "Courses" && <TermsAndConditions />}
+      {activeSection !== "Glam Sessions" && activeSection !== "Courses" && (
+        <TermsAndConditions />
+      )}
       <PaymentDetails />
     </div>
   );

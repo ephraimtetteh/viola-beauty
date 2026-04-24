@@ -57,11 +57,13 @@ export default function EssentialsServices() {
         if (!glam?.length) return;
         setServices((prev) =>
           prev.map((svc) => {
-            const match = glam.find((g) =>
-              g.name
-                .toLowerCase()
-                .includes(svc.name.toLowerCase().split(" ")[0]),
-            );
+            // Match by finding a glam rate whose name contains the service name
+            // or the service name contains the glam rate name
+            const match = glam.find((g) => {
+              const gName = g.name.toLowerCase();
+              const sName = svc.name.toLowerCase();
+              return gName.includes(sName) || sName.includes(gName);
+            });
             return match ? { ...svc, price: match.price } : svc;
           }),
         );

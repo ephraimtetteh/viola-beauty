@@ -43,11 +43,11 @@ export default function StudioServices() {
         if (!glam?.length) return;
         setServices((prev) =>
           prev.map((svc) => {
-            const match = glam.find(
-              (g) =>
-                g.name.toLowerCase().includes("studio") &&
-                svc.name.toLowerCase().includes("studio"),
-            );
+            const sName = svc.name.toLowerCase();
+            const match = glam.find((g) => {
+              const gName = g.name.toLowerCase();
+              return gName.includes(sName) || sName.includes(gName);
+            });
             return match ? { ...svc, price: match.price } : svc;
           }),
         );
